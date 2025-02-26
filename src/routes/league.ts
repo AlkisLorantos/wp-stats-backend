@@ -9,7 +9,7 @@
 // export default router;
 
 import express, { Request, Response } from "express";
-import { create } from "../controllers/league"; // ✅ Fixed import statement
+import { create } from "../controllers/league";
 
 const router = express.Router();
 

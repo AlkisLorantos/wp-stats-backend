@@ -1,0 +1,1 @@
+export const ALLOWED_USER_ROLES = ["Admin", "Coach", "Me"]
