@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id       Int     @id @default(autoincrement())
+  username String  @unique
+  password String
+  role     String  // Admin, Coach, 
+}
+
+model Player {
+  id Int @id @default(autoincrement()) 
+  firstName String
+  lastName String
+  name String @unique
+  birthday DateTime
+  nationality String
+  position String
+  capNumber Int
+  teamId Int?
+  team Team? @relation(fields: [teamId], references: [id])
+  gameStats GameStat[]
+}
+
+model Team {
+  id Int @id @default(autoincrement())
+  name String
+  leagueId Int
+  league League @relation(fields: [leagueId], references: [id])
+  players  Player[]
+  homeGames Game[] @relation("HomeTeam")
+  awayGames Game[] @relation("AwayTeam")
+}
+
+model Game {
+  id Int @id @default(autoincrement())
+  date DateTime
+  homeTeamId Int
+  awayTeamId Int
+  leagueId Int
+  homeTeamScore Int
+  awayTeamScore Int
+  homeTeam Team @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam Team @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  league League @relation(fields: [leagueId], references: [id])
+  gameStats GameStat[]
+}
+
+model League {
+  id Int @id @default(autoincrement())
+  name String
+  country String
+  teams Team[]
+  games Game[]
+}
+
+model GameStat {
+  id Int @id @default(autoincrement())
+  playerId Int
+  gameId Int
+  shotsMissed Int
+  shotsScored Int
+  assists Int
+  exclusions Int
+  turnovers Int
+  player Player @relation(fields: [playerId], references: [id])
+  game Game  @relation(fields: [gameId], references: [id])
+}
+
