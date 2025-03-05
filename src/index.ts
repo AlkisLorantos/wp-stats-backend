@@ -21,11 +21,12 @@
 
 
 import express, { Express, Request, Response, Application } from 'express';
-import dotenv from 'dotenv';
+import dotenv from "dotenv"
 import router from '../src/routes/index';
 import cors from 'cors';
-import AuthRouter from './routes/client/user';
+import AuthRouter from './routes/client/auth';
 import { authMiddleware } from './middleware/client/auth';
+
 
 dotenv.config();
 
@@ -46,6 +47,8 @@ app.use("/api/protected", authMiddleware, (req, res) => {
 }); //Protected routes
 
 app.use(router);
+
+
 
 app.listen(port, () => {
 

@@ -55,26 +55,43 @@
 // router.delete("/:id", remove);
 
 // export default router;
+import { Router } from "express";
+import { create, show, showMany, update, remove } from "../controllers/players";
+import { authMiddleware } from "../middleware/client/auth";
+import { fullAccessOnly } from "../middleware/client/permissions";
 
-import express from "express";
-import { create, show, showMany, update, remove } from "../controllers/players/index";
+const router = Router();
 
-const router = express.Router();
+// 📌 Public: Get Players (No Authentication)
+router.get("/", showMany);
+router.get("/:id", show);
 
-// Fetch all players
-router.get("/", async (req, res) => await showMany(req, res));
-
-// Fetch a single player
-router.get("/:name", async (req, res) => await show(req, res));
-
-// Create a player
-router.post("/", async (req, res) => await create(req, res));
-
-// Update a player
-router.put("/:id", async (req, res) => await update(req, res));
-
-// Delete a player
-router.delete("/:id", async (req, res) => await remove(req, res));
+// 🔐 Protected: Only Authenticated Users Can Create/Update/Delete
+router.post("/", authMiddleware, fullAccessOnly, create);
+router.put("/:id", authMiddleware, fullAccessOnly, update);
+router.delete("/:id", authMiddleware, fullAccessOnly, remove);
 
 export default router;
+
+// import express from "express";
+// import { create, show, showMany, update, remove } from "../controllers/players/index";
+
+// const router = express.Router();
+
+// // Fetch all players
+// router.get("/", async (req, res) => await showMany(req, res));
+
+// // Fetch a single player
+// router.get("/:name", async (req, res) => await show(req, res));
+
+// // Create a player
+// router.post("/", async (req, res) => await create(req, res));
+
+// // Update a player
+// router.put("/:id", async (req, res) => await update(req, res));
+
+// // Delete a player
+// router.delete("/:id", async (req, res) => await remove(req, res));
+
+// export default router;
 

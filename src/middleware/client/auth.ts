@@ -9,27 +9,60 @@ interface AuthRequest extends Request {
     user?: { userId: number; role: string };
 }
 
+// export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
+//     const tokenHeader = req.headers.authorization;
+//     console.log("📩 Raw Authorization Header:", tokenHeader);
+
+//     if (!tokenHeader) {
+//         return res.status(401).json({ message: "Unauthorized: No token provided" });
+//     }
+
+//     const token = tokenHeader.split(" ")[1]; // Extract token
+//     console.log("🔑 Extracted Token:", token);
+
+//     try {
+//         const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { userId: number; role: string };
+//         console.log("✅ Decoded Token:", decoded);
+//         req.user = decoded;
+//         next();
+//     } catch (error) {
+//         console.error("❌ Invalid Token:", error.message);
+//         return res.status(403).json({ message: "Forbidden: Invalid token" });
+//     }
+// };
+
 // Middleware to verify JWT Token
-export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization?.split(" ")[1]; // Extract token
+export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction): void => {
+    const tokenHeader = req.headers.authorization;
+
+    console.log("📩 Raw Authorization Header:", tokenHeader);
+
+    if (!tokenHeader || !tokenHeader.startsWith("Bearer ")) {
+        res.status(401).json({ message: "Unauthorized: No valid token provided" });
+        return;
+    }
+
+    // Extract the actual token value
+    const token = tokenHeader.replace("Bearer ", "").trim(); 
+    console.log("🔑 Extracted Token:", token);
 
     if (!token) {
-        res.status(401).json({ message: "Unauthorized: No token provided" }); // No user, meaning read-only access
-        return next();
+        console.log("No Token Provided");
+        res.status(401).json({ message: "Unauthorized: No token provided" });
+        return;
     }
 
     try {
         // Verify token
         const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { userId: number; role: string };
+        console.log("✅ Decoded Token:", decoded);
         req.user = decoded; // Attach user details
-        next();
+        next(); // Continue to the next middleware or route
     } catch (error) {
-        res.status(403).json({ message: "Forbidden: Invalid token" }); // Invalid token = read-only access
-        next();
+        console.error("❌ Invalid Token:", error);
+        res.status(403).json({ message: "Forbidden: Invalid token" });
     }
 };
-
-
 // // Checking user Role
 // export const authorizeRoles = (roles: string[]) => {
 //     return (req: AuthRequest, res: Response, next:NextFunction) => {

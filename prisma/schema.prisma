@@ -20,6 +20,7 @@ model User {
   password   String
   role       String   @default("Read") // Default: Read Access
   createdAt  DateTime @default(now())
+  apiKey    String?
 }
 
 
@@ -47,19 +48,7 @@ model Team {
   awayGames Game[] @relation("AwayTeam")
 }
 
-model Game {
-  id Int @id @default(autoincrement())
-  date DateTime
-  homeTeamId Int
-  awayTeamId Int
-  leagueId Int
-  homeTeamScore Int
-  awayTeamScore Int
-  homeTeam Team @relation("HomeTeam", fields: [homeTeamId], references: [id])
-  awayTeam Team @relation("AwayTeam", fields: [awayTeamId], references: [id])
-  league League @relation(fields: [leagueId], references: [id])
-  gameStats GameStat[]
-}
+
 
 model League {
   id Int @id @default(autoincrement())
@@ -69,16 +58,43 @@ model League {
   games Game[]
 }
 
+
+
 model GameStat {
-  id Int @id @default(autoincrement())
-  playerId Int
-  gameId Int
-  shotsMissed Int
-  shotsScored Int
-  assists Int
-  exclusions Int
-  turnovers Int
-  player Player @relation(fields: [playerId], references: [id])
-  game Game  @relation(fields: [gameId], references: [id])
+  id          Int @id @default(autoincrement())
+  playerId    Int
+  gameId      Int
+  shotsMissed Int     @default(0)
+  shotsScored Int     @default(0)
+  assists     Int     @default(0)
+  exclusions  Int     @default(0)
+  turnovers   Int     @default(0)
+
+  player      Player  @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  game        Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
 }
 
+model Game {
+  id              Int  @id @default(autoincrement())
+  date            DateTime
+  homeTeamId      Int
+  awayTeamId      Int
+  leagueId        Int
+  homeTeamScore   Int  @default(0)
+  awayTeamScore   Int  @default(0)
+
+  // Aggregate team stats
+  homeTeamShots   Int  @default(0)
+  awayTeamShots   Int  @default(0)
+  homeTeamMisses  Int  @default(0)
+  awayTeamMisses  Int  @default(0)
+  homeTeamExclusions Int @default(0)
+  awayTeamExclusions Int @default(0)
+  homeTeamTurnovers Int  @default(0)
+  awayTeamTurnovers Int  @default(0)
+
+  homeTeam        Team @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam        Team @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  league          League @relation(fields: [leagueId], references: [id])
+  gameStats       GameStat[]
+}

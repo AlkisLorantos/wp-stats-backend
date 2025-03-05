@@ -56,9 +56,19 @@ export const getPlayers = async (params?: Prisma.PlayerWhereInput) => {
         },
     });
 
+    console.log('Fetched players:', players); //debugging
+
     return players;
 
 };
+
+// export const getPlayers = async () => {
+//     console.log("Connecting to database...");
+//     const players = await prisma.player.findMany();
+//     console.log("Players fetched from DB:", players);
+//     return players;
+// };
+
 
 export const updatePlayer = async (id: number, data: Prisma.PlayerUpdateInput) => {
 

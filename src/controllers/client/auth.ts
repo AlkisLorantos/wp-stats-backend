@@ -1,13 +1,15 @@
 import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
+import crypto from "crypto"
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
 import { ALLOWED_USER_ROLES } from "../../utils/constants"; // Role validation
 
+
 dotenv.config();
 const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key";
+const JWT_SECRET = process.env.JWT_SECRET || "your_super_secret_key";
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -43,7 +45,6 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     }
 };
 
-
 export const login = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { username, password } = req.body;
@@ -61,12 +62,24 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
             return res.status(401).json({ message: "Invalid username or password" });
         }
 
+        // ✅ Ensure API Key Exists (Generate if missing)
+        let apiKey = user.apiKey;
+        if (!apiKey) {
+            apiKey = crypto.randomBytes(32).toString("hex"); // Generate API Key
+            await prisma.user.update({
+                where: { id: user.id },
+                data: { apiKey },
+            });
+        }
+
         // Generate JWT Token (with Role)
         const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: "7d" });
 
+        // ✅ Send API Key & Token in Response
         return res.status(200).json({
             message: "Login successful",
             token,
+            apiKey, 
             user: { id: user.id, username: user.username, role: user.role }
         });
 

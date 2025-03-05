@@ -1,6 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { register, login } from "../../controllers/client/user";
-
+import { register, login } from "../../controllers/client/auth";
 // Wrapper function to handle async errors properly
 const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) => {
     return (req: Request, res: Response, next: NextFunction) => {
