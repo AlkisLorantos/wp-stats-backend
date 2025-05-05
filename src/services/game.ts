@@ -1,105 +1,83 @@
-import { Prisma, PrismaClient } from "@prisma/client";
-import prisma from "./prisma";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
-export const createGame = async (data: Prisma.GameCreateInput) => {
-
-    const game = await prisma.game.create({
-        data: { ...data },
-    });
-
-    return game;
-
+// CREATE GAME
+export const createGame = async ({
+  date,
+  opponent,
+  location,
+  homeOrAway,
+  teamId,
+}: {
+  date: Date;
+  opponent: string;
+  location?: string;
+  homeOrAway: "home" | "away";
+  teamId: number;
+}) => {
+  return await prisma.game.create({
+    data: {
+      date,
+      opponent,
+      location,
+      homeOrAway,
+      teamId,
+    },
+  });
 };
 
-
-export const getGame = async (id: number) => {
-
-    if (id !== null) {
-
-        const game = await prisma.game.findUnique({
-            where: {
-                id: id,
-            }
-        });
-    
-        return game;
-
-    };
-
-    const games = await prisma.game.findMany();
-
-    return games;
-
+// GET ALL GAMES
+export const getGames = async (teamId: number) => {
+  return await prisma.game.findMany({
+    where: { teamId },
+    orderBy: { date: "desc" },
+  });
 };
 
-export const updateGame = async (id: number, data: Prisma.GameUpdateInput) => {
-
-    const game = await prisma.game.update({
-        where: { id: id },
-        data: { ...data }
-    });
-
-    return game;
-
+// GET ONE GAME
+export const getGameById = async (id: number, teamId: number) => {
+  return await prisma.game.findFirst({
+    where: { id, teamId },
+  });
 };
 
-export const removeGame = async (id: number) => {
+// UPDATE GAME
+export const updateGame = async (
+  id: number,
+  teamId: number,
+  data: {
+    date?: string;
+    opponent?: string;
+    location?: string;
+    homeOrAway?: "home" | "away";
+    teamScore?: number;
+    opponentScore?: number;
+  }
+) => {
+  const game = await prisma.game.findFirst({
+    where: { id, teamId },
+  });
 
-    const game = prisma.game.delete({
-        where: { id: id }
-    });
+  if (!game) throw new Error("Game not found or unauthorized");
 
-    return game;
-
+  return await prisma.game.update({
+    where: { id },
+    data: {
+      ...data,
+      ...(data.date ? { date: new Date(data.date) } : {}),
+    },
+  });
 };
 
-export const createGameStat = async (data: Prisma.GameStatCreateInput) => {
+// DELETE GAME
+export const deleteGame = async (id: number, teamId: number) => {
+  const game = await prisma.game.findFirst({
+    where: { id, teamId },
+  });
 
-    const gameStat = await prisma.gameStat.create({
-        data: { ...data },
-    });
+  if (!game) throw new Error("Game not found or unauthorized");
 
-    return gameStat;
-
-};
-
-export const getGameStat = async (id: number) => {
-
-    if (id !== null) {
-
-        const gameStat = await prisma.gameStat.findUnique({
-            where: {
-                id: id,
-            }
-        });
-    
-        return gameStat;
-
-    };
-
-    const gameStats = await prisma.gameStat.findMany();
-
-    return gameStats;
-
-};
-
-export const updateGameStats = async (id: number, data: Prisma.GameStatUpdateInput) => {
-
-    const gameStat = await prisma.gameStat.update({
-        where: { id: id },
-        data: { ...data }
-    });
-
-    return gameStat;
-
-};
-
-export const removeGameStats = async (id: number) => {
-
-    const gameStat = prisma.gameStat.delete({
-        where: { id: id }
-    });
-
-    return gameStat;
-
+  return await prisma.game.delete({
+    where: { id },
+  });
 };

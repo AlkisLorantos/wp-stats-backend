@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { updateUserRole } from "../../controllers/client/admin";
 import { authMiddleware } from "../../middleware/client/auth";
-import { adminOnly } from '../../middleware/client/permissions'
+import { adminOnly } from '../../middleware/client/roles'
 
 const router = Router();
 

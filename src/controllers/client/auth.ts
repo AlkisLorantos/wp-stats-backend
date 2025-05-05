@@ -1,89 +1,52 @@
 import { Request, Response, NextFunction } from "express";
-import bcrypt from "bcryptjs";
-import crypto from "crypto"
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-import { PrismaClient } from "@prisma/client";
-import { ALLOWED_USER_ROLES } from "../../utils/constants"; // Role validation
+import { createTeamAndCoach, authenticateUser } from "../../services/client/user";
 
+// OST /auth/signupteam
+export const signupTeam = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const { username, password, teamName } = req.body;
 
-dotenv.config();
-const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET || "your_super_secret_key";
+  if (!username || !password || !teamName) {
+    res.status(400).json({ message: "Missing required fields" });
+    return;
+  }
 
-export const register = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const { username, password } = req.body;
-
-        //Check if User Exists
-        const existingUser = await prisma.user.findUnique({ where: { username } });
-        if (existingUser) {
-            return res.status(400).json({ message: "Username already taken" });
-        }
-
-        //Hash Password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        //Create User (Default Role: Read)
-        const user = await prisma.user.create({
-            data: {
-                username,
-                password: hashedPassword,
-                role: "Read", //Default role: Read-Only
-                createdAt: new Date(),
-            }
-        });
-
-        return res.status(201).json({
-            message: "Registration successful. Waiting for admin role assignment.",
-            user: { id: user.id, username: user.username, role: user.role }
-        });
-
-    } catch (error) {
-        next(error);
-    }
+  try {
+    const result = await createTeamAndCoach(username, password, teamName);
+    res.status(201).json({
+      message: "Team and user created successfully",
+      ...result,
+    });
+  } catch (err: any) {
+    console.error("Signup Error:", err);
+    res.status(500).json({ message: "Signup failed", error: err.message });
+  }
 };
 
-export const login = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const { username, password } = req.body;
+// POST /auth/login
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const { username, password } = req.body;
 
-        // Find User
-        const user = await prisma.user.findUnique({ where: { username } });
+  if (!username || !password) {
+    res.status(400).json({ message: "Missing username or password" });
+    return;
+  }
 
-        if (!user) {
-            return res.status(401).json({ message: "Invalid username or password" });
-        }
-
-        // Check Password
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ message: "Invalid username or password" });
-        }
-
-        // ✅ Ensure API Key Exists (Generate if missing)
-        let apiKey = user.apiKey;
-        if (!apiKey) {
-            apiKey = crypto.randomBytes(32).toString("hex"); // Generate API Key
-            await prisma.user.update({
-                where: { id: user.id },
-                data: { apiKey },
-            });
-        }
-
-        // Generate JWT Token (with Role)
-        const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: "7d" });
-
-        // ✅ Send API Key & Token in Response
-        return res.status(200).json({
-            message: "Login successful",
-            token,
-            apiKey, 
-            user: { id: user.id, username: user.username, role: user.role }
-        });
-
-    } catch (error) {
-        next(error);
-    }
+  try {
+    const result = await authenticateUser(username, password);
+    res.status(200).json({
+      message: "Login successful",
+      ...result,
+    });
+  } catch (err: any) {
+    console.error("Login Error:", err);
+    res.status(401).json({ message: err.message });
+  }
 };
