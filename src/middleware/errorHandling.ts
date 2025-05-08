@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 
-// Custom error type to standardize errors
+
 class AppError extends Error {
     public statusCode: number;
 

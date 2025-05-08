@@ -32,7 +32,7 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
     req.user = decoded;
     next();
   } catch (error) {
-    console.error("❌ Invalid Token:", error);
+    console.error(" Invalid Token:", error);
     res.status(403).json({ message: "Forbidden: Invalid token" });
   }
 };

@@ -81,3 +81,28 @@ export const deleteGame = async (id: number, teamId: number) => {
     where: { id },
   });
 };
+
+
+export const startGame = async (id: number, ) => {
+  const game = await prisma.game.findUnique({ where: { id, }})
+
+  if (game.status === 'LIVE') throw new Error("Game is already live");
+  if (game.status === 'ENDED') throw new Error("Game is already over");
+
+
+  return await prisma.game.update({
+    where: { id },
+    data: { status: 'LIVE'}
+  });
+};
+
+export const endGame = async (id: number, ) => {
+  const game = await prisma.game.findUnique({ where: { id }})
+
+  if (game.status !== 'LIVE') throw new Error("Game is not live yet");
+
+  return await prisma.game.update({
+    where: { id },
+    data: { status: 'ENDED'}
+  })
+}

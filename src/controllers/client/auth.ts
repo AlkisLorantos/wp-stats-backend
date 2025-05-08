@@ -22,7 +22,7 @@ export const signupTeam = async (
     });
   } catch (err: any) {
     console.error("Signup Error:", err);
-    res.status(500).json({ message: "Signup failed", error: err.message });
+    res.status(400).json({ message: err.message }); 
   }
 };
 

@@ -49,13 +49,20 @@ model Player {
   substitutionsOut Substitution[] @relation("PlayerOut")
 }
 
+enum GameStatus {
+  UPCOMING
+  LIVE
+  ENDED
+}
+
 model Game {
   id            Int      @id @default(autoincrement())
   date          DateTime
   opponent      String
   location      String?
-  homeOrAway   String    // "home" or "away"
+  homeOrAway   String?   // "home" or "away"
 
+  status        GameStatus @default(UPCOMING)
   teamScore     Int      @default(0)
   opponentScore Int      @default(0)
   teamId        Int

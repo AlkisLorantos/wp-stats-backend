@@ -8,7 +8,7 @@ import {
 } from "../services/player";
 import { AuthRequest } from "../middleware/client/auth";
 
-// GET /players - List all players for the logged-in team
+// GET /players 
 export const getAllPlayers = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const teamId = req.user?.teamId;
@@ -20,7 +20,7 @@ export const getAllPlayers = async (req: AuthRequest, res: Response): Promise<vo
   }
 };
 
-// GET /players/:id - Get one player (team-safe)
+// GET /players/:id 
 export const getPlayer = async (req: AuthRequest, res: Response): Promise<void> => {
   const { id } = req.params;
   const teamId = req.user?.teamId;
@@ -93,7 +93,7 @@ export const updatePlayerController = async (req: AuthRequest, res: Response): P
   }
 };
 
-// DELETE /players/:id - Remove a player
+// DELETE /players/:id 
 export const deletePlayerController = async (req: AuthRequest, res: Response): Promise<void> => {
   const teamId = req.user?.teamId;
   const { id } = req.params;

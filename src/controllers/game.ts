@@ -5,10 +5,12 @@ import {
   getGameById,
   updateGame,
   deleteGame,
+  endGame, 
+  startGame
 } from "../services/game";
 import { AuthRequest } from "../middleware/client/auth";
 
-// GET /games - List all games for the logged-in team
+// GET /games 
 export const getAllGames = async (
   req: AuthRequest,
   res: Response
@@ -21,7 +23,7 @@ export const getAllGames = async (
   }
 };
 
-// GET /games/:id - Fetch a specific game
+// GET /games/:id 
 export const getGame = async (
   req: AuthRequest,
   res: Response
@@ -40,7 +42,7 @@ export const getGame = async (
   }
 };
 
-// POST /games - Create a new game for the current team
+// POST /games 
 export const createGameController = async (
     req: AuthRequest,
     res: Response
@@ -77,7 +79,8 @@ export const createGameController = async (
       res.status(500).json({ message: "Failed to create game", error: err.message });
     }
   };
-// PUT /games/:id - Update a specific game
+
+// PUT /games/:id 
 export const updateGameController = async (
     req: AuthRequest,
     res: Response
@@ -108,7 +111,7 @@ export const updateGameController = async (
     }
   };
 
-// DELETE /games/:id - Delete a game
+// DELETE /games/:id 
 export const deleteGameController = async (
   req: AuthRequest,
   res: Response
@@ -122,3 +125,25 @@ export const deleteGameController = async (
     res.status(500).json({ message: "Failed to delete game", error: err.message });
   }
 };
+
+export const startGameController = async (req, res ) => {
+  const { id } = req.params;
+
+  try {
+    const game = await startGame(Number(id),);
+    res.json({ message: "Game started", game });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to start game", error: err.message });
+  }
+}
+
+export const endGameController = async (req, res ) => {
+  const { id } = req.params;
+
+  try {
+    const game = await endGame(Number(id),);
+    res.json({ message: "Game ended", game });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to end game", error: err.message });
+  }
+}
