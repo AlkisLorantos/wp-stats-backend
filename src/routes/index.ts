@@ -6,6 +6,7 @@ import statRoutes from "./stat";
 import rosterRoutes from "./roster";
 import rosterPresetRoutes from './rosterPreset';
 import substitutionRoutes from "./substitution";
+import lineupRoutes from "./lineup";
 
 
 import { authMiddleware } from "../middleware/client/auth";
@@ -25,5 +26,6 @@ router.use("/stats", statRoutes);
 router.use("/", rosterRoutes);        
 router.use("/presets", rosterPresetRoutes);
 router.use("/substitutions", substitutionRoutes);
+router.use("/lineups", lineupRoutes)
 
 export default router;
