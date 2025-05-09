@@ -2,9 +2,9 @@ import { Request, RequestHandler, Response } from "express";
 import { getStartingLineup, saveStartingLineup } from "../services/lineup";
 
 export const saveStartingLineupController: RequestHandler = async (req: Request, res: Response) => {
-  const { gameId, period, assignments } = req.body;
+  const { gameId, period, lineup } = req.body;
 
-  if (!gameId || !period || !assignments) {
+  if (!gameId || !period || !lineup) {
  res.status(400).json({ message: "Missing required fields" });
   }
 
@@ -12,7 +12,7 @@ export const saveStartingLineupController: RequestHandler = async (req: Request,
     await saveStartingLineup({
       gameId: Number(gameId),
       period: Number(period),
-      assignments,
+      lineup,
     });
 
     res.json({ message: "Starting lineup saved" });
@@ -24,7 +24,7 @@ export const saveStartingLineupController: RequestHandler = async (req: Request,
 export const getStartingLineupController: RequestHandler = async (req, res, next) => {
     try {
       const gameId = Number(req.params.gameId);
-      const period = Number(req.query.period); 
+      const period = Number(req.params.period); 
   
       if (isNaN(period)) {
         res.status(400).json({ message: "Missing or invalid period" });

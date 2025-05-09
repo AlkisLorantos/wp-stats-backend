@@ -6,7 +6,7 @@ import {
   updatePlayerController,
   deletePlayerController,
 } from "../controllers/player";
-
+import { getPlayerStatsController } from "../controllers/stat";
 import { authMiddleware } from "../middleware/client/auth";
 import { requireRole } from "../middleware/client/roles";
 
@@ -18,6 +18,7 @@ router.use(authMiddleware);
 // Routes for all authenticated users
 router.get("/", getAllPlayers);
 router.get("/:id", getPlayer);
+router.get("/:playersId/stats", getPlayerStatsController);
 
 // Coach-only actions
 router.post("/", requireRole(["coach"]), createPlayerController);

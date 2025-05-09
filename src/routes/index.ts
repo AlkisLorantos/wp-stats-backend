@@ -1,6 +1,7 @@
 import { Router } from "express";
 import authRoutes from "./client/auth";
 import playerRoutes from "./player";
+import teamRoutes from "./team";
 import gameRoutes from "./game";
 import statRoutes from "./stat";
 import rosterRoutes from "./roster";
@@ -21,11 +22,13 @@ router.use("/auth", authRoutes);
 router.use(authMiddleware);
 
 router.use("/players", playerRoutes);
+router.use("/teams", teamRoutes)
 router.use("/games", gameRoutes);
-router.use("/stats", statRoutes);
+router.use("/games", statRoutes);
+router.use("/games", lineupRoutes)
 router.use("/", rosterRoutes);        
 router.use("/presets", rosterPresetRoutes);
 router.use("/substitutions", substitutionRoutes);
-router.use("/lineups", lineupRoutes)
+
 
 export default router;

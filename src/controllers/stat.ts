@@ -5,6 +5,8 @@ import {
   deleteStatEvent,
 } from "../services/stat";
 import { AuthRequest } from "../middleware/client/auth";
+import { getPlayerStats } from "../services/stat";
+import { getTeamStats } from "../services/stat";
 
 // POST /stats
 export const createStat = async (req: AuthRequest, res: Response): Promise<void> => {
@@ -56,5 +58,27 @@ export const deleteStat = async (req: AuthRequest, res: Response): Promise<void>
     res.json({ message: "Stat deleted" });
   } catch (err) {
     res.status(500).json({ message: "Failed to delete stat", error: err.message });
+  }
+};
+
+export const getPlayerStatsController = async (req: AuthRequest, res: Response): Promise<void> => {
+  const playerId = Number(req.params.playerId);
+
+  try {
+    const stats = await getPlayerStats(playerId);
+    res.json(stats);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch player stats", error: err.message });
+  }
+};
+
+export const getTeamStatsController = async (req: AuthRequest, res: Response): Promise<void> => {
+  const teamId = Number(req.params.teamId);
+
+  try {
+    const stats = await getTeamStats(teamId);
+    res.json(stats);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch team stats", error: err.message });
   }
 };

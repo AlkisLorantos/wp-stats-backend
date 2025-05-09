@@ -133,7 +133,7 @@ model Substitution {
   id         Int      @id @default(autoincrement())
   gameId     Int
   period     Int
-  time       Float    // in seconds or minutes
+  time       Float    
   playerInId Int
   playerOutId Int
   teamId     Int

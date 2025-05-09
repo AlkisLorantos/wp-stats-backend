@@ -7,7 +7,7 @@ const router = Router();
 
 router.use(authMiddleware);
 
-router.post("/games/:gameId/lineup", requireRole(["coach"]), saveStartingLineupController);
-router.get("/games/:gameId/lineup/:period", getStartingLineupController);
+router.post("/:gameId/starting-lineup", requireRole(["coach"]), saveStartingLineupController);
+router.get("/:gameId/starting-lineup/:period", getStartingLineupController);
 
 export default router;

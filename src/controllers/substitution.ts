@@ -3,6 +3,7 @@ import { AuthRequest } from "../middleware/client/auth";
 import {
   recordSubstitution,
   getSubstitutionsForGame,
+  calculatePlayingTime
 } from "../services/substitution";
 
 export const createSubstitution = async (req: AuthRequest, res: Response): Promise<void> => {
@@ -41,3 +42,20 @@ export const getGameSubstitutions = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: "Failed to fetch substitutions", error: err.message });
   }
 };
+
+export const getPlayerPlayingTime = async (req: AuthRequest, res: Response) => {  
+  const { gameId, playerId } = req.params;
+  
+  if (!gameId || !playerId) {
+    res.status(400).json({ message: "Missing required fields" });
+    return;
+  }
+  try {
+    const playingTime = await calculatePlayingTime(Number(gameId), Number(playerId));
+    res.json({ playerId: Number(playerId), gameId: Number(gameId), playingTime });
+  } catch (err: any) {
+    console.error("Error calculating playing time:", err);
+    res.status(500).json({ message: "Failed to calculate playing time", error: err.message });
+  }
+};
+//

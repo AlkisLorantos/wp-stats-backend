@@ -71,3 +71,17 @@ export const deleteStatEvent = async (id: number, teamId: number) => {
 
   return await prisma.statEvent.delete({ where: { id } });
 };
+
+export const getPlayerStats = async (playerId: number) => {
+  return await prisma.statEvent.findMany({
+    where: { playerId },
+    orderBy: { timestamp: "desc" },
+  });
+};
+
+export const getTeamStats = async (teamId: number) => {
+  return await prisma.statEvent.findMany({
+    where: { player: { teamId } },
+    orderBy: { timestamp: "desc" },
+  });
+};

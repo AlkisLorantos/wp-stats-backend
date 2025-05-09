@@ -4,14 +4,14 @@ const prisma = new PrismaClient();
 export const saveStartingLineup = async ({
   gameId,
   period,
-  assignments,
+  lineup,
 }: {
   gameId: number;
   period: number;
-  assignments: { playerId: number }[];
+  lineup: { playerId: number }[];
 }) => {
 
-  if (assignments.length > 7) {
+  if (lineup.length > 7) {
     throw new Error("Starting lineup cannot have more than 7 players.");
   }
 
@@ -22,7 +22,7 @@ export const saveStartingLineup = async ({
 
   
   return await prisma.startingLineup.createMany({
-    data: assignments.map((a) => ({
+    data: lineup.map((a) => ({
       gameId,
       period,
       playerId: a.playerId,
