@@ -3,11 +3,10 @@ import { saveStartingLineupController, getStartingLineupController } from "../co
 import { requireRole } from "../middleware/client/roles";
 import { authMiddleware } from "../middleware/client/auth";
 
-const router = Router();
-
+const router = Router({ mergeParams: true });
 router.use(authMiddleware);
 
-router.post("/:gameId/starting-lineup", requireRole(["coach"]), saveStartingLineupController);
-router.get("/:gameId/starting-lineup/:period", getStartingLineupController);
+router.post("/", requireRole(["coach"]), saveStartingLineupController);
+router.get("/:period", getStartingLineupController);
 
 export default router;

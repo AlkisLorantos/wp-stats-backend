@@ -8,6 +8,7 @@ import rosterRoutes from "./roster";
 import rosterPresetRoutes from './rosterPreset';
 import substitutionRoutes from "./substitution";
 import lineupRoutes from "./lineup";
+import globalStatsRoutes from "./globalStats";
 
 
 import { authMiddleware } from "../middleware/client/auth";
@@ -15,20 +16,15 @@ import { requireRole } from "../middleware/client/roles";
 
 const router = Router();
 
-// Public routes
 router.use("/auth", authRoutes);
 
-// Protected routes (must be authenticated)
 router.use(authMiddleware);
 
 router.use("/players", playerRoutes);
 router.use("/teams", teamRoutes)
+router.use("/stats", globalStatsRoutes);
 router.use("/games", gameRoutes);
-router.use("/games", statRoutes);
-router.use("/games", lineupRoutes)
-router.use("/", rosterRoutes);        
-router.use("/presets", rosterPresetRoutes);
-router.use("/substitutions", substitutionRoutes);
+
 
 
 export default router;

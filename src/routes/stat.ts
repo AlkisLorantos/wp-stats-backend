@@ -8,15 +8,13 @@ import {
 import { authMiddleware } from "../middleware/client/auth";
 import { requireRole } from "../middleware/client/roles";
 
-const router = Router();
+const statRouter = Router({ mergeParams: true });
 
-router.use(authMiddleware);
+statRouter.use(authMiddleware);
 
-// Public team access
-router.get("/game/:gameId", getGameStats);
+statRouter.get("/", getGameStats);
+statRouter.post("/", requireRole(["coach"]), createStat);
+statRouter.delete("/:id", requireRole(["coach"]), deleteStat);
 
-// Coach-only stat input/delete
-router.post("/", requireRole(["coach"]), createStat);
-router.delete("/:id", requireRole(["coach"]), deleteStat);
 
-export default router;
+export default statRouter;

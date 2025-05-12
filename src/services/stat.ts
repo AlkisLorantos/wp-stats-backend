@@ -18,7 +18,7 @@ type StatInput = {
     teamId: number,
     data: StatInput
   ) => {
-    // Validate ownership
+
     const [player, game] = await Promise.all([
       prisma.player.findFirst({ where: { id: data.playerId, teamId } }),
       prisma.game.findFirst({ where: { id: data.gameId, teamId } }),
@@ -28,7 +28,7 @@ type StatInput = {
       throw new Error("Unauthorized or invalid game/player");
     }
   
-    // Create stat event
+
     return await prisma.statEvent.create({
       data: {
         type: data.type.toLowerCase(),
@@ -43,22 +43,24 @@ type StatInput = {
       },
     });
   };
-// Get all stat events for a game
+
 export const getStatsForGame = async (gameId: number, teamId: number) => {
-  // Confirm game belongs to team
-  const game = await prisma.game.findFirst({ where: { id: gameId, teamId } });
+
+  const game = await prisma.game.findFirst({
+     where: { id: gameId, teamId },
+  });
   if (!game) throw new Error("Game not found or unauthorized");
 
   return await prisma.statEvent.findMany({
     where: { gameId },
     orderBy: { timestamp: "asc" },
     include: {
-      player: true,
+      player: { select: { id: true, name: true, capNumber: true}},
     },
   });
 };
 
-// Delete a stat event
+
 export const deleteStatEvent = async (id: number, teamId: number) => {
   const stat = await prisma.statEvent.findFirst({
     where: { id },

@@ -12,15 +12,12 @@ import { requireRole } from "../middleware/client/roles";
 
 const router = Router();
 
-// All routes require authentication
 router.use(authMiddleware);
 
-// Routes for all authenticated users
 router.get("/", getAllPlayers);
 router.get("/:id", getPlayer);
-router.get("/:playersId/stats", getPlayerStatsController);
+router.get("/:id/stats", getPlayerStatsController);
 
-// Coach-only actions
 router.post("/", requireRole(["coach"]), createPlayerController);
 router.put("/:id", requireRole(["coach"]), updatePlayerController);
 router.delete("/:id", requireRole(["coach"]), deletePlayerController);

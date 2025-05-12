@@ -1,4 +1,4 @@
-import { Response } from "express";
+import e, { Response } from "express";
 import {
   createStatEvent,
   getStatsForGame,
@@ -8,9 +8,19 @@ import { AuthRequest } from "../middleware/client/auth";
 import { getPlayerStats } from "../services/stat";
 import { getTeamStats } from "../services/stat";
 
-// POST /stats
+
 export const createStat = async (req: AuthRequest, res: Response): Promise<void> => {
-    const { gameId, playerId, type, x, y, capNumber, context, period, clock } = req.body;
+  const gameId  = Number(req.params.id);
+  const {
+       playerId, 
+       type, 
+       x, 
+       y, 
+       capNumber, 
+       context, 
+       period, 
+       clock,
+      } = req.body;
   
     if (!gameId || !playerId || !type) {
       res.status(400).json({ message: "Missing required fields" });
@@ -37,9 +47,9 @@ export const createStat = async (req: AuthRequest, res: Response): Promise<void>
     }
   };
 
-// GET /stats/game/:gameId
+
 export const getGameStats = async (req: AuthRequest, res: Response): Promise<void> => {
-  const { gameId } = req.params;
+  const gameId = req.params.id;
 
   try {
     const stats = await getStatsForGame(Number(gameId), req.user.teamId);
@@ -49,7 +59,7 @@ export const getGameStats = async (req: AuthRequest, res: Response): Promise<voi
   }
 };
 
-// DELETE /stats/:id
+
 export const deleteStat = async (req: AuthRequest, res: Response): Promise<void> => {
   const { id } = req.params;
 
@@ -80,5 +90,20 @@ export const getTeamStatsController = async (req: AuthRequest, res: Response): P
     res.json(stats);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch team stats", error: err.message });
+  }
+};
+
+export const getGlobalStatsController = async (
+  req: AuthRequest, 
+  res: Response
+): Promise<void> => {
+  try {
+    const stats = await getTeamStats(req.user.teamId);
+    res.json(stats);
+  } catch (err) {
+    console.error("Error fetching global stats:", err);
+    res
+      .status(500)
+      .json({ message: "Failed to fetch global stats", error: err.message });
   }
 };
