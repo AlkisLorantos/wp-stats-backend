@@ -2,11 +2,11 @@ import { Response } from "express";
 import { AuthRequest } from "../middleware/client/auth";
 import { assignRosterToGame, getRosterForGame } from "../services/gameRoster";
 
-// POST /games/:gameId/roster
+
 export const assignRoster = async (req: AuthRequest, res: Response): Promise<void> => {
   const gameId = Number(req.params.gameId);
   const teamId = req.user.teamId;
-  const roster = req.body.roster; // [{ playerId: number, capNumber?: number }]
+  const roster = req.body.roster; 
 
   if (!Array.isArray(roster) || roster.length === 0) {
     res.status(400).json({ message: "Roster must be a non-empty array" });
@@ -21,7 +21,6 @@ export const assignRoster = async (req: AuthRequest, res: Response): Promise<voi
   }
 };
 
-// GET /games/:gameId/roster
 export const getRoster = async (req: AuthRequest, res: Response): Promise<void> => {
   const gameId = Number(req.params.gameId);
   const teamId = req.user.teamId;

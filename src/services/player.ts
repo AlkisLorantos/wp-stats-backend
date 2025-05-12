@@ -59,7 +59,7 @@ export const getPlayerById = async (id: number, teamId: number) => {
   const gamesMap = new Map<number, any>();
 
 for (const stat of player.stats) {
-  if (!stat.game) continue; // Skip if the stat is not linked to a valid game
+  if (!stat.game) continue; 
 
   const gameId = stat.gameId;
 
@@ -82,7 +82,7 @@ for (const stat of player.stats) {
   switch (stat.type) {
     case "goal":
       gameStats.goals++;
-      gameStats.shots++; // goal counts as shot
+      gameStats.shots++; 
       totals.goals++;
       totals.shots++;
       break;
@@ -118,7 +118,7 @@ return {
 };
 };
 
-// Update a player (only if they belong to the team)
+
 export const updatePlayer = async (
   id: number,
   teamId: number,
@@ -151,7 +151,7 @@ export const updatePlayer = async (
   });
 };
 
-// Delete a player (team-safe)
+
 export const deletePlayer = async (id: number, teamId: number) => {
   const player = await prisma.player.findFirst({
     where: { id, teamId },

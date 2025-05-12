@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-// Save a preset
+
 export const createRosterPreset = async (
   teamId: number,
   name: string,
@@ -21,7 +21,7 @@ export const createRosterPreset = async (
   });
 };
 
-// Fetch all presets for team
+
 export const getRosterPresets = async (teamId: number) => {
   return prisma.rosterPreset.findMany({
     where: { teamId },
@@ -33,7 +33,7 @@ export const getRosterPresets = async (teamId: number) => {
   });
 };
 
-// Get one preset by ID
+
 export const getPresetById = async (presetId: number, teamId: number) => {
   return prisma.rosterPreset.findFirst({
     where: { id: presetId, teamId },

@@ -6,10 +6,11 @@ import {
   getPlayerPlayingTime
 } from "../controllers/substitution";
 
-const router = Router();
+const router = Router({ mergeParams: true });
 
 router.use(authMiddleware);
+
 router.post("/", createSubstitution);
-router.get("/:gameId", getGameSubstitutions);
-router.get("/games/:gameId/players/:playerId/playing-time", getPlayerPlayingTime);
+router.get("/", getGameSubstitutions);
+router.get("/playing-time", getPlayerPlayingTime);
 export default router;

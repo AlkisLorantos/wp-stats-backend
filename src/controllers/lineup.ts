@@ -2,22 +2,28 @@ import { Request, RequestHandler, Response } from "express";
 import { getStartingLineup, saveStartingLineup } from "../services/lineup";
 
 export const saveStartingLineupController: RequestHandler = async (req: Request, res: Response) => {
-  const { gameId, period, lineup } = req.body;
+  const { period, lineup } = req.body;
+  const gameId = Number(req.params.gameId)
 
-  if (!gameId || !period || !lineup) {
- res.status(400).json({ message: "Missing required fields" });
+  if (!period || !lineup) {
+    res.status(400).json({ message: "Missing required fields" });
+    return;
   }
 
   try {
     await saveStartingLineup({
-      gameId: Number(gameId),
+      gameId,
       period: Number(period),
       lineup,
     });
 
     res.json({ message: "Starting lineup saved" });
   } catch (err: any) {
-    res.status(500).json({ message: "Failed to save starting lineup", error: err.message });
+    console.error(" saveStartingLineup service error:", err);
+
+    if (!res.headersSent) {
+      res.status(500).json({ message: err.message || "Failed to save starting lineup" });
+    }
   }
 };
 

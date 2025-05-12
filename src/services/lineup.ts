@@ -15,7 +15,21 @@ export const saveStartingLineup = async ({
     throw new Error("Starting lineup cannot have more than 7 players.");
   }
 
-  // Clear existing starting lineup for this game and period
+  const assignedToRoster = await prisma.gameRoster.findMany({
+    where: { gameId },
+    select: { playerId: true },
+  });
+
+  const assignedToRosterIds = new Set(assignedToRoster.map((a) => a.playerId));
+  const lineupIds = lineup.map((p) => p.playerId);
+  const invalidIds = lineupIds.filter((id) => !assignedToRosterIds.has(id));
+
+  if (invalidIds.length > 0) {
+    throw new Error(
+      `Players with IDs ${invalidIds.join(", ")} are not assigned to the game roster.`
+    );
+  }
+
   await prisma.startingLineup.deleteMany({
     where: { gameId, period },
   });
@@ -34,6 +48,6 @@ export const saveStartingLineup = async ({
 export const getStartingLineup = async (gameId: number, period: number) => {
     return prisma.startingLineup.findMany({
       where: { gameId, period },
-      include: { player: true }, // optional: include player details
+      include: { player: true }, 
     });
   };

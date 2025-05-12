@@ -11,6 +11,8 @@ import {
 import { authMiddleware } from "../middleware/client/auth";
 import { requireRole } from "../middleware/client/roles";
 
+import substitutionRoutes from "./substitution";
+
 const router = Router();
 
 router.use(authMiddleware);
@@ -24,5 +26,7 @@ router.delete("/:id", requireRole(["coach"]), deleteGameController);
 
 router.patch("/:id/start", requireRole(["coach"]), startGameController);
 router.patch("/:id/end", requireRole(["coach"]), endGameController);
+
+router.use("/:gameId/substitutions", substitutionRoutes);
 
 export default router;
