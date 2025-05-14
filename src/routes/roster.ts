@@ -3,7 +3,7 @@ import { assignRoster, getRoster } from "../controllers/roster";
 import { authMiddleware } from "../middleware/client/auth";
 import { requireRole } from "../middleware/client/roles";
 
-const router = Router();
+const router = Router({ mergeParams: true });
 router.use(authMiddleware);
 
 router.post("/", requireRole(["coach"]), assignRoster);

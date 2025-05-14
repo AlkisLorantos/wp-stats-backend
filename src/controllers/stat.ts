@@ -10,7 +10,7 @@ import { getTeamStats } from "../services/stat";
 
 
 export const createStat = async (req: AuthRequest, res: Response): Promise<void> => {
-  const gameId  = Number(req.params.id);
+  const gameId  = Number(req.params.gameId);
   const {
        playerId, 
        type, 
@@ -49,7 +49,7 @@ export const createStat = async (req: AuthRequest, res: Response): Promise<void>
 
 
 export const getGameStats = async (req: AuthRequest, res: Response): Promise<void> => {
-  const gameId = req.params.id;
+  const gameId = req.params.gameId;
 
   try {
     const stats = await getStatsForGame(Number(gameId), req.user.teamId);

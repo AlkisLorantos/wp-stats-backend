@@ -14,35 +14,45 @@ type StatInput = {
     clock?: number;
   };
   
-  export const createStatEvent = async (
-    teamId: number,
-    data: StatInput
-  ) => {
-
+  export const createStatEvent = async (teamId: number, data: StatInput) => {
+   
     const [player, game] = await Promise.all([
       prisma.player.findFirst({ where: { id: data.playerId, teamId } }),
       prisma.game.findFirst({ where: { id: data.gameId, teamId } }),
     ]);
+    if (!player || !game) throw new Error("Unauthorized or invalid game/player");
   
-    if (!player || !game) {
-      throw new Error("Unauthorized or invalid game/player");
-    }
+   
+    return await prisma.$transaction(async (tx) => {
+    
+      const ev = await tx.statEvent.create({
+        data: {
+          type:  data.type.toLowerCase(),
+          x:     data.x,
+          y:     data.y,
+          capNumber: data.capNumber,
+          context:   data.context?.toLowerCase(),
+          period:  data.period,
+          clock:   data.clock,
+          playerId: data.playerId,
+          gameId:   data.gameId,
+        },
+      });
   
-
-    return await prisma.statEvent.create({
-      data: {
-        type: data.type.toLowerCase(),
-        x: data.x,
-        y: data.y,
-        capNumber: data.capNumber,
-        context: data.context?.toLowerCase(),
-        period: data.period,
-        clock: data.clock,
-        playerId: data.playerId,
-        gameId: data.gameId,
-      },
+     
+      if (ev.type === "goal") {
+        const isHome = player.teamId === game.teamId;  
+        await tx.game.update({
+          where: { id: game.id },
+          data:  isHome
+            ? { teamScore:     { increment: 1 } }
+            : { opponentScore: { increment: 1 } },
+        });
+      }
+  
+      return ev;          
     });
-  };
+  }
 
 export const getStatsForGame = async (gameId: number, teamId: number) => {
 

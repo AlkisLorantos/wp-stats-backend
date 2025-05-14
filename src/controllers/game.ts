@@ -10,7 +10,6 @@ import {
 } from "../services/game";
 import { AuthRequest } from "../middleware/client/auth";
 
-// GET /games 
 export const getAllGames = async (
   req: AuthRequest,
   res: Response
@@ -23,26 +22,28 @@ export const getAllGames = async (
   }
 };
 
-// GET /games/:id 
-export const getGame = async (
-  req: AuthRequest,
-  res: Response
-): Promise<void> => {
-  const { id } = req.params;
-
+export const getGame = async (req: AuthRequest, res: Response) => {
   try {
-    const game = await getGameById(Number(id), req.user.teamId);
-    if (!game) {
-      res.status(404).json({ message: "Game not found" });
-      return;
-    }
+    const gameId = Number(req.params.gameId);
+    const teamId = req.user.teamId
+
+    if (Number.isNaN(gameId)) {
+      res.status(400).json({ message: "Invalid game ID" });
+      return;     
+  }
+
+  const game = await getGameById(gameId,teamId);
+  if (!game) {
+    res.status(404).json({ message: "Game not found" });
+    return;
+  }
     res.json(game);
   } catch (err) {
-    res.status(500).json({ message: "Failed to fetch game" });
+    res.status(500).json({ message: "Failed to fetch game", error: err.message });
   }
 };
 
-// POST /games 
+
 export const createGameController = async (
     req: AuthRequest,
     res: Response
@@ -80,7 +81,6 @@ export const createGameController = async (
     }
   };
 
-// PUT /games/:id 
 export const updateGameController = async (
     req: AuthRequest,
     res: Response
@@ -111,7 +111,6 @@ export const updateGameController = async (
     }
   };
 
-// DELETE /games/:id 
 export const deleteGameController = async (
   req: AuthRequest,
   res: Response

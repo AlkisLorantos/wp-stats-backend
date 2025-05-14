@@ -11,7 +11,7 @@ export const createSubstitution = async (
   res: Response
 ): Promise<void> => {
   const teamId = req.user?.teamId;
-  const gameId = Number(req.params.id);
+  const gameId = Number(req.params.gameId);
   const { period, time, playerInId, playerOutId } = req.body;
 
   if (!teamId) {
@@ -49,7 +49,7 @@ export const createSubstitution = async (
 };
 
 export const getGameSubstitutions = async (req: AuthRequest, res: Response) => {
-  const gameId = Number(req.params.id);
+  const gameId = Number(req.params.gameId);
   const teamId = req.user?.teamId;
 
   const parsedGameId = Number(gameId);
@@ -69,7 +69,7 @@ export const getGameSubstitutions = async (req: AuthRequest, res: Response) => {
 };
 
 export const getPlayerPlayingTime = async (req: AuthRequest, res: Response) => {
-  const gameId = Number(req.params.id);
+  const gameId = Number(req.params.gameId);
   const playerId = Number(req.params.playerId);
   const teamId = req.user?.teamId;
 

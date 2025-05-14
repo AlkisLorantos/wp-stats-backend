@@ -21,21 +21,21 @@ const router = Router({ mergeParams: false });
 router.use(authMiddleware);
 
 router.get("/", getAllGames);
-router.get("/:id", getGame);
+router.get("/:gameId", getGame);
 
 router.post("/", requireRole(["coach"]), createGameController);
-router.put("/:id",  requireRole(["coach"]), updateGameController);
-router.delete("/:id", requireRole(["coach"]), deleteGameController);
+router.put("/:gameId",  requireRole(["coach"]), updateGameController);
+router.delete("/:gameId", requireRole(["coach"]), deleteGameController);
 
-router.patch("/:id/start", requireRole(["coach"]), startGameController);
-router.patch("/:id/end",   requireRole(["coach"]), endGameController);
+router.patch("/:gameId/start", requireRole(["coach"]), startGameController);
+router.patch("/:gameId/end",   requireRole(["coach"]), endGameController);
 
-router.use("/:id/stats", statRouter);
-router.use("/:id/substitutions", substitutionRouter);
-router.use("/:id/roster", rosterRouter);
-router.use("/:id/lineup", lineupRouter)
+router.use("/:gameId/stats", statRouter);
+router.use("/:gameId/substitutions", substitutionRouter);
+router.use("/:gameId/roster", rosterRouter);
+router.use("/:gameId/starting-lineup", lineupRouter)
 
 import { getPlayerPlayingTime } from "../controllers/substitution";
-router.get("/:id/players/:playerId/playing-time", getPlayerPlayingTime);
+router.get("/:gameId/players/:playerId/playing-time", getPlayerPlayingTime);
 
 export default router;

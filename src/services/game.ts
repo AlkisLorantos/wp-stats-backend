@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-// CREATE GAME
+
 export const createGame = async ({
   date,
   opponent,
@@ -26,7 +26,6 @@ export const createGame = async ({
   });
 };
 
-// GET ALL GAMES
 export const getGames = async (teamId: number) => {
   return await prisma.game.findMany({
     where: { teamId },
@@ -34,14 +33,23 @@ export const getGames = async (teamId: number) => {
   });
 };
 
-// GET ONE GAME
 export const getGameById = async (id: number, teamId: number) => {
   return await prisma.game.findFirst({
     where: { id, teamId },
+    select: {
+      id: true,
+      date: true,
+      opponent: true,
+      teamScore: true,
+      opponentScore: true,
+      period: true,
+      status: true,
+      team: { select: { name: true } }
+    }
   });
 };
 
-// UPDATE GAME
+
 export const updateGame = async (
   id: number,
   teamId: number,
@@ -69,7 +77,7 @@ export const updateGame = async (
   });
 };
 
-// DELETE GAME
+
 export const deleteGame = async (id: number, teamId: number) => {
   const game = await prisma.game.findFirst({
     where: { id, teamId },

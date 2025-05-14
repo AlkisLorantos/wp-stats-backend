@@ -62,7 +62,7 @@ model Game {
   date          DateTime
   opponent      String
   location      String?
-  homeOrAway   String?   // "home" or "away"
+  homeOrAway   String?  
 
   status        GameStatus @default(UPCOMING)
   teamScore     Int      @default(0)
@@ -70,6 +70,7 @@ model Game {
   teamId        Int
   team          Team     @relation(fields: [teamId], references: [id])
   stats         StatEvent[]
+  period        Int      @default(1)
 
   GameRoster GameRoster[]
 

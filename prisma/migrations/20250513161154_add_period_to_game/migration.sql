@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Game" ADD COLUMN     "period" INTEGER NOT NULL DEFAULT 1;
