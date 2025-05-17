@@ -1,8 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 export interface AuthRequest extends Request {
   user?: {
@@ -12,18 +9,20 @@ export interface AuthRequest extends Request {
   };
 }
 
-export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction): void => {
-  const tokenHeader = req.headers.authorization;
+export const authMiddleware = (
+  req: AuthRequest, 
+  res: Response, 
+  next: NextFunction
+): void => {
+  const token = req.cookies.token as string | undefined;
 
-  if (!tokenHeader || !tokenHeader.startsWith("Bearer ")) {
-    res.status(401).json({ message: "Unauthorized: No valid token provided" });
+  if (!token) {
+    res.status(401).json({ message: "Unauthorized: No token provided" });
     return;
   }
 
-  const token = tokenHeader.replace("Bearer ", "").trim();
-
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET) as {
       userId: number;
       teamId: number;
       role: string;
