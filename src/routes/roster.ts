@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { assignRoster, getRoster } from "../controllers/roster";
+import { assignRoster, getRoster, removeFromRoster } from "../controllers/roster";
 import { authMiddleware } from "../middleware/client/auth";
 import { requireRole } from "../middleware/client/roles";
 
@@ -8,5 +8,6 @@ router.use(authMiddleware);
 
 router.post("/", requireRole(["coach"]), assignRoster);
 router.get("/", getRoster);
+router.delete("/:rosterId", requireRole(["coach"]), removeFromRoster);
 
-export default router
+export default router;

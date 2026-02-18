@@ -52,6 +52,64 @@ export const createStatEvent = async (teamId: number, data: StatInput) => {
   });
 };
 
+export const updateStatEvent = async (
+  id: number,
+  teamId: number,
+  data: {
+    playerId?: number;
+    type?: string;
+    x?: number;
+    y?: number;
+    context?: string;
+    period?: number;
+    clock?: number;
+  }
+) => {
+  const stat = await prisma.statEvent.findFirst({
+    where: { id },
+    include: { game: true },
+  });
+
+  if (!stat || stat.game.teamId !== teamId) {
+    throw new Error("Stat not found or unauthorized");
+  }
+
+  const oldType = stat.type;
+  const newType = data.type?.toUpperCase() as EventType | undefined;
+
+  return await prisma.$transaction(async (tx) => {
+    if (oldType === "GOAL" && newType && newType !== "GOAL") {
+      await tx.game.update({
+        where: { id: stat.gameId },
+        data: { teamScore: { decrement: 1 } },
+      });
+    }
+
+    if (oldType !== "GOAL" && newType === "GOAL") {
+      await tx.game.update({
+        where: { id: stat.gameId },
+        data: { teamScore: { increment: 1 } },
+      });
+    }
+
+    const updated = await tx.statEvent.update({
+      where: { id },
+      data: {
+        playerId: data.playerId,
+        type: newType || stat.type,
+        x: data.x,
+        y: data.y,
+        context: data.context?.toUpperCase() as GameSituation | undefined,
+        period: data.period,
+        clock: data.clock,
+      },
+    });
+
+    return updated;
+  });
+};
+
+
 export const getStatsForGame = async (gameId: number, teamId: number) => {
   const game = await prisma.game.findFirst({
     where: { id: gameId, teamId },
