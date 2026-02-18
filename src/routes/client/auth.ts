@@ -1,13 +1,13 @@
-// in routes/client/auth.ts (or wherever you mount your auth router)
 import { Router } from "express";
-import { signupTeam, login } from "../../controllers/client/auth";
+import { signupTeam, login, logout } from "../../controllers/client/auth";
 import { authMiddleware, AuthRequest } from "../../middleware/client/auth";
 import { Response } from "express";
 
 const router = Router();
 
-router.post("/signup", signupTeam);
+router.post("/signup", signupTeam)
 router.post("/login", login);
+router.post("/logout", logout);
 
 
 router.get(

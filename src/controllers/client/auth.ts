@@ -80,3 +80,8 @@ export const login = async (
     res.status(401).json({ message: err.message });
   }
 };
+
+export const logout = async (req: Request, res: Response) => {
+  res.clearCookie(COOKIE_NAME);
+  res.status(200).json({ message: "Logged out" });
+};

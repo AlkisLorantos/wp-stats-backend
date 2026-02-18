@@ -7,6 +7,33 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum EventType {
+  GOAL
+  SHOT
+  ASSIST
+  STEAL
+  TURNOVER
+  BLOCK
+  EXCLUSION
+  PENALTY_SHOT
+}
+
+enum GameSituation {
+  SIX_ON_SIX
+  MAN_UP
+  MAN_DOWN
+  COUNTER
+  PENALTY
+}
+
+enum ShotOutcome {
+  GOAL
+  SAVED
+  MISSED
+  BLOCKED
+  POST
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   username  String   @unique
@@ -35,7 +62,7 @@ model Player {
   name       String   @unique
   birthday   DateTime?
   position   String?
-  capNumber  Int?      // Assigned only per game
+  capNumber  Int?
   teamId     Int
   team       Team     @relation(fields: [teamId], references: [id])
   stats      StatEvent[]
@@ -80,33 +107,39 @@ model Game {
 }
 
 model StatEvent {
-  id         Int      @id @default(autoincrement())
-  timestamp  DateTime @default(now())
-  type       String
-  context    String?       // e.g. "powerplay", "penalty", "counterattack"
-  period     Int?          // 1st quarter, 2nd, etc.
-  clock      Float?        // time in minutes (e.g. 3.5 = 3:30)
-  x          Float?        // x-position on pool
-  y          Float?
-  capNumber  Int?
-  playerId   Int
-  gameId     Int
+  id            Int       @id @default(autoincrement())
+  timestamp     DateTime  @default(now())
+  type          EventType
+  context       GameSituation?
+  shotOutcome   ShotOutcome?
+  period        Int?
+  clock         Float?
+  x             Float?
+  y             Float?
+  capNumber     Int?
+  playerId      Int
+  gameId        Int
 
-  player     Player   @relation(fields: [playerId], references: [id])
-  game       Game     @relation(fields: [gameId], references: [id])
+  player        Player    @relation(fields: [playerId], references: [id])
+  game          Game      @relation(fields: [gameId], references: [id])
+
+  // Link goal to assist
+  assistEventId Int?      @unique
+  assistEvent   StatEvent? @relation("GoalAssist", fields: [assistEventId], references: [id])
+  goalEvent     StatEvent? @relation("GoalAssist")
 }
 
 model GameRoster {
   id        Int      @id @default(autoincrement())
-  capNumber Int      // 1 through 15
+  capNumber Int
   playerId  Int
   gameId    Int
 
   player    Player   @relation(fields: [playerId], references: [id])
   game      Game     @relation(fields: [gameId], references: [id])
 
-  @@unique([gameId, capNumber]) // Each cap number is unique per game
-  @@unique([gameId, playerId])  // Each player can only be assigned once per game
+  @@unique([gameId, capNumber])
+  @@unique([gameId, playerId])
 }
 
 model RosterPreset {
@@ -130,6 +163,7 @@ model RosterPresetPlayer {
 
   @@unique([presetId, capNumber])
 }
+
 model Substitution {
   id         Int      @id @default(autoincrement())
   gameId     Int
@@ -151,5 +185,5 @@ model StartingLineup {
   playerId  Int
 
   game      Game    @relation(fields: [gameId], references: [id])
-   player    Player   @relation(fields: [playerId], references: [id])
+  player    Player   @relation(fields: [playerId], references: [id])
 }

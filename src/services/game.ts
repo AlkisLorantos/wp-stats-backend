@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-
 export const createGame = async ({
   date,
   opponent,
@@ -40,15 +39,16 @@ export const getGameById = async (id: number, teamId: number) => {
       id: true,
       date: true,
       opponent: true,
+      location: true,
+      homeOrAway: true,
       teamScore: true,
       opponentScore: true,
       period: true,
       status: true,
-      team: { select: { name: true } }
-    }
+      team: { select: { name: true } },
+    },
   });
 };
-
 
 export const updateGame = async (
   id: number,
@@ -77,7 +77,6 @@ export const updateGame = async (
   });
 };
 
-
 export const deleteGame = async (id: number, teamId: number) => {
   const game = await prisma.game.findFirst({
     where: { id, teamId },
@@ -90,27 +89,31 @@ export const deleteGame = async (id: number, teamId: number) => {
   });
 };
 
+export const startGame = async (id: number, teamId: number) => {
+  const game = await prisma.game.findFirst({
+    where: { id, teamId },
+  });
 
-export const startGame = async (id: number, ) => {
-  const game = await prisma.game.findUnique({ where: { id, }})
-
-  if (game.status === 'LIVE') throw new Error("Game is already live");
-  if (game.status === 'ENDED') throw new Error("Game is already over");
-
+  if (!game) throw new Error("Game not found or unauthorized");
+  if (game.status === "LIVE") throw new Error("Game is already live");
+  if (game.status === "ENDED") throw new Error("Game is already over");
 
   return await prisma.game.update({
     where: { id },
-    data: { status: 'LIVE'}
+    data: { status: "LIVE" },
   });
 };
 
-export const endGame = async (id: number, ) => {
-  const game = await prisma.game.findUnique({ where: { id }})
+export const endGame = async (id: number, teamId: number) => {
+  const game = await prisma.game.findFirst({
+    where: { id, teamId },
+  });
 
-  if (game.status !== 'LIVE') throw new Error("Game is not live yet");
+  if (!game) throw new Error("Game not found or unauthorized");
+  if (game.status !== "LIVE") throw new Error("Game is not live yet");
 
   return await prisma.game.update({
     where: { id },
-    data: { status: 'ENDED'}
-  })
-}
+    data: { status: "ENDED" },
+  });
+};
