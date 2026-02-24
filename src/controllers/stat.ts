@@ -4,6 +4,7 @@ import {
   getStatsForGame,
   deleteStatEvent,
   updateStatEvent,
+  createGoalWithAssistEvent,
 } from "../services/stat";
 import { AuthRequest } from "../middleware/client/auth";
 import { getPlayerStats } from "../services/stat";
@@ -44,6 +45,33 @@ export const createStat = async (req: AuthRequest, res: Response): Promise<void>
   } catch (err: any) {
     console.error("Error creating stat:", err);
     res.status(500).json({ message: "Failed to create stat", error: err.message });
+  }
+};
+
+export const createGoalWithAssist = async (req: AuthRequest, res: Response): Promise<void> => {
+  const gameId = Number(req.params.gameId);
+  const teamId = req.user.teamId;
+  const { scorerId, assisterId, period, clock, context } = req.body;
+
+  if (!gameId || !scorerId) {
+    res.status(400).json({ message: "Missing required fields" });
+    return;
+  }
+
+  try {
+    const result = await createGoalWithAssistEvent(teamId, {
+      gameId,
+      scorerId,
+      assisterId,
+      period,
+      clock,
+      context,
+    });
+
+    res.status(201).json({ message: "Goal recorded", ...result });
+  } catch (err: any) {
+    console.error("Error creating goal with assist:", err);
+    res.status(500).json({ message: "Failed to record goal", error: err.message });
   }
 };
 

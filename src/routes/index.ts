@@ -24,7 +24,7 @@ router.use("/players", playerRoutes);
 router.use("/teams", teamRoutes)
 router.use("/stats", globalStatsRoutes);
 router.use("/games", gameRoutes);
-
+router.use("/roster-presets", rosterPresetRoutes);
 
 
 export default router;

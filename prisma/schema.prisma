@@ -114,8 +114,10 @@ model StatEvent {
   shotOutcome   ShotOutcome?
   period        Int?
   clock         Float?
-  x             Float?
+  x             Float? //pool location
   y             Float?
+  goalX         Float? //goal location
+  goalY         Float?
   capNumber     Int?
   playerId      Int
   gameId        Int

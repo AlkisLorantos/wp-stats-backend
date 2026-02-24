@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
-import { AuthRequest } from "../middleware/client/auth"; 
+import { AuthRequest } from "../middleware/client/auth";
 import {
   createRosterPreset,
   getRosterPresets,
   getPresetById,
-} from "../services/rosterPreset"; 
+  deleteRosterPreset,
+} from "../services/rosterPreset";
 
 export const savePresetController = async (req: AuthRequest, res: Response): Promise<void> => {
   const teamId = req.user?.teamId;
@@ -47,5 +48,17 @@ export const getPresetController = async (req: AuthRequest, res: Response): Prom
     res.json(preset);
   } catch (err: any) {
     res.status(500).json({ message: "Failed to fetch preset", error: err.message });
+  }
+};
+
+export const deletePresetController = async (req: AuthRequest, res: Response): Promise<void> => {
+  const teamId = req.user?.teamId;
+  const { id } = req.params;
+
+  try {
+    await deleteRosterPreset(Number(id), teamId);
+    res.json({ message: "Preset deleted" });
+  } catch (err: any) {
+    res.status(500).json({ message: "Failed to delete preset", error: err.message });
   }
 };

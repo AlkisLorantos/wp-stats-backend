@@ -39,16 +39,75 @@ export const createStatEvent = async (teamId: number, data: StatInput) => {
     });
 
     if (ev.type === "GOAL") {
-      const isHome = player.teamId === game.teamId;
       await tx.game.update({
         where: { id: game.id },
-        data: isHome
-          ? { teamScore: { increment: 1 } }
-          : { opponentScore: { increment: 1 } },
+        data: { teamScore: { increment: 1 } },
       });
     }
 
     return ev;
+  });
+};
+
+export const createGoalWithAssistEvent = async (
+  teamId: number,
+  data: {
+    gameId: number;
+    scorerId: number;
+    assisterId: number | null;
+    period: number;
+    clock: number;
+    context?: string;
+  }
+) => {
+  const [scorer, game] = await Promise.all([
+    prisma.player.findFirst({ where: { id: data.scorerId, teamId } }),
+    prisma.game.findFirst({ where: { id: data.gameId, teamId } }),
+  ]);
+  if (!scorer || !game) throw new Error("Unauthorized or invalid game/player");
+
+  if (data.assisterId) {
+    const assister = await prisma.player.findFirst({
+      where: { id: data.assisterId, teamId },
+    });
+    if (!assister) throw new Error("Invalid assist player");
+  }
+
+  const context = data.context?.toUpperCase() as GameSituation | undefined;
+
+  return await prisma.$transaction(async (tx) => {
+    const goalEvent = await tx.statEvent.create({
+      data: {
+        type: "GOAL",
+        context,
+        period: data.period,
+        clock: data.clock,
+        playerId: data.scorerId,
+        gameId: data.gameId,
+      },
+    });
+
+    let assistEvent = null;
+    if (data.assisterId) {
+      assistEvent = await tx.statEvent.create({
+        data: {
+          type: "ASSIST",
+          context,
+          period: data.period,
+          clock: data.clock,
+          playerId: data.assisterId,
+          gameId: data.gameId,
+          assistEventId: goalEvent.id,
+        },
+      });
+    }
+
+    await tx.game.update({
+      where: { id: game.id },
+      data: { teamScore: { increment: 1 } },
+    });
+
+    return { goal: goalEvent, assist: assistEvent };
   });
 };
 
@@ -109,7 +168,6 @@ export const updateStatEvent = async (
   });
 };
 
-
 export const getStatsForGame = async (gameId: number, teamId: number) => {
   const game = await prisma.game.findFirst({
     where: { id: gameId, teamId },
@@ -135,7 +193,20 @@ export const deleteStatEvent = async (id: number, teamId: number) => {
     throw new Error("Unauthorized or stat not found");
   }
 
-  return await prisma.statEvent.delete({ where: { id } });
+  return await prisma.$transaction(async (tx) => {
+    await tx.statEvent.deleteMany({
+      where: { assistEventId: id },
+    });
+
+    if (stat.type === "GOAL") {
+      await tx.game.update({
+        where: { id: stat.gameId },
+        data: { teamScore: { decrement: 1 } },
+      });
+    }
+
+    return await tx.statEvent.delete({ where: { id } });
+  });
 };
 
 export const getPlayerStats = async (playerId: number) => {

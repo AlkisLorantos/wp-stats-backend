@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-
 export const createRosterPreset = async (
   teamId: number,
   name: string,
@@ -21,7 +20,6 @@ export const createRosterPreset = async (
   });
 };
 
-
 export const getRosterPresets = async (teamId: number) => {
   return prisma.rosterPreset.findMany({
     where: { teamId },
@@ -33,7 +31,6 @@ export const getRosterPresets = async (teamId: number) => {
   });
 };
 
-
 export const getPresetById = async (presetId: number, teamId: number) => {
   return prisma.rosterPreset.findFirst({
     where: { id: presetId, teamId },
@@ -42,5 +39,21 @@ export const getPresetById = async (presetId: number, teamId: number) => {
         include: { player: true },
       },
     },
+  });
+};
+
+export const deleteRosterPreset = async (presetId: number, teamId: number) => {
+  const preset = await prisma.rosterPreset.findFirst({
+    where: { id: presetId, teamId },
+  });
+
+  if (!preset) throw new Error("Preset not found or unauthorized");
+
+  await prisma.rosterPresetPlayer.deleteMany({
+    where: { presetId },
+  });
+
+  return prisma.rosterPreset.delete({
+    where: { id: presetId },
   });
 };

@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "StatEvent" ADD COLUMN     "goalX" DOUBLE PRECISION,
+ADD COLUMN     "goalY" DOUBLE PRECISION;
