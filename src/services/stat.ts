@@ -1,4 +1,4 @@
-import { PrismaClient, EventType, GameSituation } from "@prisma/client";
+import { PrismaClient, EventType, GameSituation, ShotOutcome } from "@prisma/client";
 const prisma = new PrismaClient();
 
 type StatInput = {
@@ -46,6 +46,83 @@ export const createStatEvent = async (teamId: number, data: StatInput) => {
     }
 
     return ev;
+  });
+};
+
+export const createShotWithLocationEvent = async (
+  teamId: number,
+  data: {
+    gameId: number;
+    playerId: number;
+    x: number;
+    y: number;
+    goalX?: number;
+    goalY?: number;
+    shotOutcome: string;
+    assisterId?: number;
+    period: number;
+    clock: number;
+    context?: string;
+  }
+) => {
+  const [player, game] = await Promise.all([
+    prisma.player.findFirst({ where: { id: data.playerId, teamId } }),
+    prisma.game.findFirst({ where: { id: data.gameId, teamId } }),
+  ]);
+  if (!player || !game) throw new Error("Unauthorized or invalid game/player");
+
+  if (data.assisterId) {
+    const assister = await prisma.player.findFirst({
+      where: { id: data.assisterId, teamId },
+    });
+    if (!assister) throw new Error("Invalid assist player");
+  }
+
+  const isGoal = data.shotOutcome === "GOAL";
+  const eventType = isGoal ? "GOAL" : "SHOT";
+  const context = data.context?.toUpperCase() as GameSituation | undefined;
+  const shotOutcome = data.shotOutcome.toUpperCase() as ShotOutcome;
+
+  return await prisma.$transaction(async (tx) => {
+    const shotEvent = await tx.statEvent.create({
+      data: {
+        type: eventType,
+        x: data.x,
+        y: data.y,
+        goalX: data.goalX,
+        goalY: data.goalY,
+        shotOutcome: shotOutcome,
+        context,
+        period: data.period,
+        clock: data.clock,
+        playerId: data.playerId,
+        gameId: data.gameId,
+      },
+    });
+
+    let assistEvent = null;
+    if (isGoal && data.assisterId) {
+      assistEvent = await tx.statEvent.create({
+        data: {
+          type: "ASSIST",
+          context,
+          period: data.period,
+          clock: data.clock,
+          playerId: data.assisterId,
+          gameId: data.gameId,
+          assistEventId: shotEvent.id,
+        },
+      });
+    }
+
+    if (isGoal) {
+      await tx.game.update({
+        where: { id: game.id },
+        data: { teamScore: { increment: 1 } },
+      });
+    }
+
+    return { shot: shotEvent, assist: assistEvent };
   });
 };
 

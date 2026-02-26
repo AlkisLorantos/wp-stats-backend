@@ -5,6 +5,7 @@ import {
   deleteStatEvent,
   updateStatEvent,
   createGoalWithAssistEvent,
+  createShotWithLocationEvent
 } from "../services/stat";
 import { AuthRequest } from "../middleware/client/auth";
 import { getPlayerStats } from "../services/stat";
@@ -45,6 +46,49 @@ export const createStat = async (req: AuthRequest, res: Response): Promise<void>
   } catch (err: any) {
     console.error("Error creating stat:", err);
     res.status(500).json({ message: "Failed to create stat", error: err.message });
+  }
+};
+
+export const createShotWithLocation = async (req: AuthRequest, res: Response): Promise<void> => {
+  const gameId = Number(req.params.gameId);
+  const teamId = req.user.teamId;
+  const { 
+    playerId, 
+    x, 
+    y, 
+    goalX, 
+    goalY, 
+    shotOutcome, 
+    assisterId, 
+    period, 
+    clock, 
+    context 
+  } = req.body;
+
+  if (!gameId || !playerId || x === undefined || y === undefined) {
+    res.status(400).json({ message: "Missing required fields" });
+    return;
+  }
+
+  try {
+    const result = await createShotWithLocationEvent(teamId, {
+      gameId,
+      playerId,
+      x,
+      y,
+      goalX,
+      goalY,
+      shotOutcome,
+      assisterId,
+      period,
+      clock,
+      context,
+    });
+
+    res.status(201).json({ message: "Shot recorded", ...result });
+  } catch (err: any) {
+    console.error("Error creating shot:", err);
+    res.status(500).json({ message: "Failed to record shot", error: err.message });
   }
 };
 

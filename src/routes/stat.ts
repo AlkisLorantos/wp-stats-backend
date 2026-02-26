@@ -5,6 +5,7 @@ import {
   deleteStat,
   updateStat,
   createGoalWithAssist,
+  createShotWithLocation
 } from "../controllers/stat";
 
 import { authMiddleware } from "../middleware/client/auth";
@@ -17,6 +18,7 @@ statRouter.use(authMiddleware);
 statRouter.get("/", getGameStats);
 statRouter.post("/", requireRole(["coach"]), createStat);
 statRouter.post("/goal-with-assist", requireRole(["coach"]), createGoalWithAssist);
+statRouter.post("/shot", requireRole(["coach"]), createShotWithLocation);
 statRouter.put("/:id", requireRole(["coach"]), updateStat);
 statRouter.delete("/:id", requireRole(["coach"]), deleteStat);
 

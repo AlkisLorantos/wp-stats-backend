@@ -16,6 +16,7 @@ enum EventType {
   BLOCK
   EXCLUSION
   PENALTY_SHOT
+  SAVE
 }
 
 enum GameSituation {
