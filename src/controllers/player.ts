@@ -8,7 +8,7 @@ import {
 } from "../services/player";
 import { AuthRequest } from "../middleware/client/auth";
 
-// GET /players 
+// /players 
 export const getAllPlayers = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const teamId = req.user?.teamId;
@@ -20,7 +20,7 @@ export const getAllPlayers = async (req: AuthRequest, res: Response): Promise<vo
   }
 };
 
-// GET /players/:id 
+
 export const getPlayer = async (req: AuthRequest, res: Response): Promise<void> => {
   const { id } = req.params;
   const teamId = req.user?.teamId;
@@ -36,6 +36,8 @@ export const getPlayer = async (req: AuthRequest, res: Response): Promise<void> 
       id: player.id,
       firstName: player.firstName,
       lastName: player.lastName,
+      name: `${player.firstName} ${player.lastName}`,
+      capNumber: player.capNumber,
       position: player.position,
       birthday: player.birthday,
       totals: player.totals,
@@ -47,7 +49,7 @@ export const getPlayer = async (req: AuthRequest, res: Response): Promise<void> 
   }
 };
 
-// POST /players - Create a player
+//  /players - Create a player
 export const createPlayerController = async (req: AuthRequest, res: Response): Promise<void> => {
   const teamId = req.user?.teamId;
   const { firstName, lastName, capNumber, position } = req.body;
@@ -72,7 +74,7 @@ export const createPlayerController = async (req: AuthRequest, res: Response): P
   }
 };
 
-// PUT /players/:id - Update a player
+//  /players/:id - Update a player
 export const updatePlayerController = async (req: AuthRequest, res: Response): Promise<void> => {
   const teamId = req.user?.teamId;
   const { id } = req.params;
@@ -93,7 +95,7 @@ export const updatePlayerController = async (req: AuthRequest, res: Response): P
   }
 };
 
-// DELETE /players/:id 
+
 export const deletePlayerController = async (req: AuthRequest, res: Response): Promise<void> => {
   const teamId = req.user?.teamId;
   const { id } = req.params;

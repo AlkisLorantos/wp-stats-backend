@@ -165,7 +165,7 @@ export const deleteStat = async (req: AuthRequest, res: Response): Promise<void>
 };
 
 export const getPlayerStatsController = async (req: AuthRequest, res: Response): Promise<void> => {
-  const playerId = Number(req.params.playerId);
+  const playerId = Number(req.params.id);
 
   try {
     const stats = await getPlayerStats(playerId);

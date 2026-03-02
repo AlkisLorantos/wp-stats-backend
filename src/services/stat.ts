@@ -287,11 +287,45 @@ export const deleteStatEvent = async (id: number, teamId: number) => {
 };
 
 export const getPlayerStats = async (playerId: number) => {
-  return await prisma.statEvent.findMany({
+  const events = await prisma.statEvent.findMany({
     where: { playerId },
-    orderBy: { timestamp: "desc" },
   });
+
+  const stats = {
+    goals: 0,
+    assists: 0,
+    shots: 0,
+    steals: 0,
+    blocks: 0,
+    saves: 0,
+    exclusions: 0,
+    turnovers: 0,
+  };
+
+  for (const event of events) {
+    if (event.type === "GOAL") {
+      stats.goals++;
+      stats.shots++;
+    } else if (event.type === "SHOT") {
+      stats.shots++;
+    } else if (event.type === "ASSIST") {
+      stats.assists++;
+    } else if (event.type === "STEAL") {
+      stats.steals++;
+    } else if (event.type === "BLOCK") {
+      stats.blocks++;
+    } else if (event.type === "SAVE") {
+      stats.saves++;
+    } else if (event.type === "EXCLUSION") {
+      stats.exclusions++;
+    } else if (event.type === "TURNOVER") {
+      stats.turnovers++;
+    }
+  }
+
+  return stats;
 };
+
 
 export const getTeamStats = async (teamId: number) => {
   return await prisma.statEvent.findMany({
