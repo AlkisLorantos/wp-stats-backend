@@ -10,6 +10,8 @@ import {
   getTeamStats,
 } from "../services/stat";
 import { AuthRequest } from "../middleware/client/auth";
+import { createStatSchema, createShotSchema, updateStatSchema } from "../validators/stat";
+import { validate } from "../middleware/validate";
 
 export const createStatController = async (req: AuthRequest, res: Response): Promise<void> => {
   const gameId = Number(req.params.gameId);
