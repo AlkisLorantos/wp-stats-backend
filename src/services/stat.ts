@@ -286,7 +286,12 @@ export const deleteStatEvent = async (id: number, teamId: number) => {
   });
 };
 
-export const getPlayerStats = async (playerId: number) => {
+export const getPlayerStats = async (playerId: number, teamId: number) => {
+  const player = await prisma.player.findFirst({
+    where: { id: playerId, teamId },
+  });
+  if (!player) throw new Error("Player not found or unauthorized");
+
   const events = await prisma.statEvent.findMany({
     where: { playerId },
   });

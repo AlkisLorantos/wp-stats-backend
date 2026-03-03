@@ -1,11 +1,11 @@
 import { Router } from "express";
 import {
-  createStat,
-  getGameStats,
-  deleteStat,
-  updateStat,
-  createGoalWithAssist,
-  createShotWithLocation
+  createStatController,
+  getGameStatsController,
+  deleteStatController,
+  updateStatController,
+  createGoalWithAssistController,
+  createShotWithLocationController
 } from "../controllers/stat";
 
 import { authMiddleware } from "../middleware/client/auth";
@@ -15,11 +15,11 @@ const statRouter = Router({ mergeParams: true });
 
 statRouter.use(authMiddleware);
 
-statRouter.get("/", getGameStats);
-statRouter.post("/", requireRole(["coach"]), createStat);
-statRouter.post("/goal-with-assist", requireRole(["coach"]), createGoalWithAssist);
-statRouter.post("/shot", requireRole(["coach"]), createShotWithLocation);
-statRouter.put("/:id", requireRole(["coach"]), updateStat);
-statRouter.delete("/:id", requireRole(["coach"]), deleteStat);
+statRouter.get("/", getGameStatsController);
+statRouter.post("/", requireRole(["coach"]), createStatController);
+statRouter.post("/goal-with-assist", requireRole(["coach"]), createGoalWithAssistController);
+statRouter.post("/shot", requireRole(["coach"]), createShotWithLocationController);
+statRouter.put("/:id", requireRole(["coach"]), updateStatController);
+statRouter.delete("/:id", requireRole(["coach"]), deleteStatController);
 
 export default statRouter;

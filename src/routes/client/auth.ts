@@ -2,11 +2,12 @@ import { Router } from "express";
 import { signupTeam, login, logout } from "../../controllers/client/auth";
 import { authMiddleware, AuthRequest } from "../../middleware/client/auth";
 import { Response } from "express";
+import { rateLimitAuth } from "../../middleware/rateLimit";
 
 const router = Router();
 
-router.post("/signup", signupTeam)
-router.post("/login", login);
+router.post("/signup", rateLimitAuth, signupTeam)
+router.post("/login", rateLimitAuth, login);
 router.post("/logout", logout);
 
 
