@@ -14,7 +14,9 @@ import { authMiddleware } from "../middleware/client/auth";
 import { requireRole } from "../middleware/client/roles";
 import lineupRouter from "./lineup";
 import substitutionRouter from "./substitution";
-
+import { validate } from "../middleware/validate";
+import { createGameSchema, updateGameSchema } from "../validators/game";
+import { getPlayerPlayingTime } from "../controllers/substitution";
 
 const router = Router({ mergeParams: false });        
 
@@ -23,19 +25,18 @@ router.use(authMiddleware);
 router.get("/", getAllGames);
 router.get("/:gameId", getGame);
 
-router.post("/", requireRole(["coach"]), createGameController);
-router.put("/:gameId",  requireRole(["coach"]), updateGameController);
+router.post("/", requireRole(["coach"]), validate(createGameSchema), createGameController);
+router.put("/:gameId", requireRole(["coach"]), validate(updateGameSchema), updateGameController);
 router.delete("/:gameId", requireRole(["coach"]), deleteGameController);
 
 router.patch("/:gameId/start", requireRole(["coach"]), startGameController);
-router.patch("/:gameId/end",   requireRole(["coach"]), endGameController);
+router.patch("/:gameId/end", requireRole(["coach"]), endGameController);
 
 router.use("/:gameId/stats", statRouter);
 router.use("/:gameId/substitutions", substitutionRouter);
 router.use("/:gameId/roster", rosterRouter);
-router.use("/:gameId/starting-lineup", lineupRouter)
+router.use("/:gameId/starting-lineup", lineupRouter);
 
-import { getPlayerPlayingTime } from "../controllers/substitution";
 router.get("/:gameId/players/:playerId/playing-time", getPlayerPlayingTime);
 
 export default router;
