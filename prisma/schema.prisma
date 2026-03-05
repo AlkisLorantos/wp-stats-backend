@@ -126,7 +126,6 @@ model StatEvent {
   player        Player    @relation(fields: [playerId], references: [id])
   game          Game      @relation(fields: [gameId], references: [id])
 
-  // Link goal to assist
   assistEventId Int?      @unique
   assistEvent   StatEvent? @relation("GoalAssist", fields: [assistEventId], references: [id])
   goalEvent     StatEvent? @relation("GoalAssist")

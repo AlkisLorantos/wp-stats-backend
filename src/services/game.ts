@@ -98,9 +98,17 @@ export const startGame = async (id: number, teamId: number) => {
   if (game.status === "LIVE") throw new Error("Game is already live");
   if (game.status === "ENDED") throw new Error("Game is already over");
 
+  const q1Lineup = await prisma.startingLineup.findMany({
+    where: { gameId: id, period: 1 },
+  });
+
+  if (q1Lineup.length !== 7) {
+    throw new Error("Q1 starting lineup must have exactly 7 players");
+  }
+
   return await prisma.game.update({
     where: { id },
-    data: { status: "LIVE" },
+    data: { status: "LIVE", period: 1 },
   });
 };
 
