@@ -7,12 +7,14 @@ export const createGame = async ({
   location,
   homeOrAway,
   teamId,
+  competitionId,
 }: {
   date: Date;
   opponent: string;
   location?: string;
   homeOrAway: "home" | "away";
   teamId: number;
+  competitionId?: number;
 }) => {
   return await prisma.game.create({
     data: {
@@ -21,6 +23,7 @@ export const createGame = async ({
       location,
       homeOrAway,
       teamId,
+      competitionId,
     },
   });
 };
@@ -29,6 +32,9 @@ export const getGames = async (teamId: number) => {
   return await prisma.game.findMany({
     where: { teamId },
     orderBy: { date: "desc" },
+    include: {
+      competition: true,
+    },
   });
 };
 
@@ -46,6 +52,7 @@ export const getGameById = async (id: number, teamId: number) => {
       period: true,
       status: true,
       team: { select: { name: true } },
+      competition: true,
     },
   });
 };

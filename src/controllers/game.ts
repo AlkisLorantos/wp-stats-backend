@@ -50,7 +50,7 @@ export const createGameController = async (
   req: AuthRequest,
   res: Response
 ): Promise<void> => {
-  const { date, opponent, location, homeOrAway } = req.body;
+  const { date, opponent, location, homeOrAway, competitionId } = req.body;
   const teamId = req.user?.teamId;
 
   if (!teamId) {
@@ -75,11 +75,12 @@ export const createGameController = async (
       location,
       homeOrAway,
       teamId,
+      competitionId: competitionId ? Number(competitionId) : undefined,
     });
 
     res.status(201).json({ message: "Game created", game: newGame });
   } catch (err: any) {
-    res.status(500).json({ message: "Failed to create game", error: err.message });
+    res.status(500).json({ message: "Failed to create game" });
   }
 };
 
