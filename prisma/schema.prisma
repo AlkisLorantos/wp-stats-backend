@@ -35,6 +35,12 @@ enum ShotOutcome {
   POST
 }
 
+enum GameStatus {
+  UPCOMING
+  LIVE
+  ENDED
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   username  String   @unique
@@ -52,6 +58,7 @@ model Team {
   users    User[]
   players  Player[]
   games    Game[]
+  competitions Competition[]
 
   RosterPreset RosterPreset[]
 }
@@ -79,11 +86,17 @@ model Player {
   StartingLineup StartingLineup[]
 }
 
-enum GameStatus {
-  UPCOMING
-  LIVE
-  ENDED
+model Competition {
+  id     Int     @id @default(autoincrement())
+  name   String
+  type   String? 
+  season String? 
+  teamId Int
+  team   Team    @relation(fields: [teamId], references: [id])
+  games  Game[]
 }
+
+
 
 model Game {
   id            Int      @id @default(autoincrement())
@@ -93,17 +106,20 @@ model Game {
   homeOrAway   String?  
 
   status        GameStatus @default(UPCOMING)
+  period        Int      @default(1)
   teamScore     Int      @default(0)
   opponentScore Int      @default(0)
+
   teamId        Int
   team          Team     @relation(fields: [teamId], references: [id])
+
+  competitionId  Int?
+  competition    Competition? @relation(fields: [competitionId], references: [id])
+
   stats         StatEvent[]
-  period        Int      @default(1)
-
+  
   GameRoster GameRoster[]
-
   Substitution Substitution[]
-
   StartingLineup StartingLineup[]
 }
 
@@ -115,9 +131,9 @@ model StatEvent {
   shotOutcome   ShotOutcome?
   period        Int?
   clock         Float?
-  x             Float? //pool location
+  x             Float? 
   y             Float?
-  goalX         Float? //goal location
+  goalX         Float?
   goalY         Float?
   capNumber     Int?
   playerId      Int

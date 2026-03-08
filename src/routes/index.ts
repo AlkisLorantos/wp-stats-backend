@@ -6,6 +6,7 @@ import gameRoutes from "./game";
 import rosterPresetRoutes from './rosterPreset';
 import { authMiddleware } from "../middleware/client/auth";
 import { rateLimitGeneral } from "../middleware/rateLimit";
+import competitionRoutes from "./competition";
 
 const router = Router();
 
@@ -19,6 +20,7 @@ router.use("/players", playerRoutes);
 router.use("/teams", teamRoutes)
 router.use("/games", gameRoutes);
 router.use("/roster-presets", rosterPresetRoutes);
+router.use("/competitions", competitionRoutes);
 
 
 export default router;
