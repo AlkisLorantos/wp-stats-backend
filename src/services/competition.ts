@@ -1,5 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { prisma } from "../lib/prisma";
 
 export const getCompetitions = async (teamId: number) => {
   return await prisma.competition.findMany({

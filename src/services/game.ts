@@ -1,5 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { prisma } from "../lib/prisma";
 
 export const createGame = async ({
   date,
@@ -91,8 +90,14 @@ export const deleteGame = async (id: number, teamId: number) => {
 
   if (!game) throw new Error("Game not found or unauthorized");
 
-  return await prisma.game.delete({
-    where: { id },
+  return await prisma.$transaction(async (tx) => {
+
+    await tx.statEvent.deleteMany({ where: { gameId: id } });
+    await tx.startingLineup.deleteMany({ where: { gameId: id } });
+    await tx.substitution.deleteMany({ where: { gameId: id } });
+    await tx.gameRoster.deleteMany({ where: { gameId: id } });
+
+    return await tx.game.delete({ where: { id } });
   });
 };
 

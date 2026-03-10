@@ -1,5 +1,6 @@
-import { PrismaClient, EventType, GameSituation, ShotOutcome } from "@prisma/client";
-const prisma = new PrismaClient();
+import { EventType, GameSituation, ShotOutcome } from "@prisma/client";
+
+import { prisma } from "../lib/prisma"; 
 
 type StatInput = {
   gameId: number;

@@ -1,5 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { prisma } from "../lib/prisma";
 
 export const createPlayer = async (
   teamId: number,
@@ -10,6 +9,15 @@ export const createPlayer = async (
     position?: string;
   }
 ) => {
+  if (data.capNumber) {
+    const existing = await prisma.player.findFirst({
+      where: { teamId, capNumber: data.capNumber },
+    });
+    if (existing) {
+      throw new Error(`Cap number ${data.capNumber} is already assigned to ${existing.name}`);
+    }
+  }
+
   return await prisma.player.create({
     data: {
       firstName: data.firstName.toUpperCase(),
@@ -132,7 +140,7 @@ export const updatePlayer = async (
   data: {
     firstName?: string;
     lastName?: string;
-    capNumber?: number;
+    capNumber?: number | null;
     position?: string;
   }
 ) => {
@@ -142,10 +150,22 @@ export const updatePlayer = async (
 
   if (!player) throw new Error("Player not found or unauthorized");
 
+  if (data.capNumber) {
+    const existing = await prisma.player.findFirst({
+      where: { 
+        teamId, 
+        capNumber: data.capNumber,
+        id: { not: id },
+      },
+    });
+    if (existing) {
+      throw new Error(`Cap number ${data.capNumber} is already assigned to ${existing.name}`);
+    }
+  }
+
   return await prisma.player.update({
     where: { id },
     data: {
-      ...data,
       ...(data.firstName && data.lastName
         ? {
             firstName: data.firstName.toUpperCase(),
@@ -154,6 +174,7 @@ export const updatePlayer = async (
           }
         : {}),
       ...(data.position ? { position: data.position.toUpperCase() } : {}),
+      ...(data.capNumber !== undefined ? { capNumber: data.capNumber } : {}),
     },
   });
 };

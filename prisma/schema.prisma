@@ -17,6 +17,7 @@ enum EventType {
   EXCLUSION
   PENALTY_SHOT
   SAVE
+  SHOT_CLOCK_VIOLATION
 }
 
 enum GameSituation {
