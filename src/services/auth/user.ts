@@ -8,16 +8,13 @@ if (!JWT_SECRET) {
   throw new Error("JWT_SECRET environment variable is required");
 }
 
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
 const BCRYPT_ROUNDS = 12;
-
 
 const validatePassword = (password: string): void => {
   if (password.length < 8) {
     throw new Error("Password must be at least 8 characters");
   }
 };
-
 
 const validateUsername = (username: string): void => {
   if (username.length < 3 || username.length > 30) {
@@ -45,7 +42,7 @@ const generateToken = (userId: number, role: string, teamId: number): string => 
     JWT_SECRET,
     { expiresIn: "7d" }
   );
-}
+};
 
 const generateApiKey = (): string => {
   return crypto.randomBytes(32).toString("hex");
@@ -56,7 +53,6 @@ export const createTeamAndCoach = async (
   password: string,
   teamName: string
 ) => {
-
   validateUsername(username);
   validatePassword(password);
 
@@ -115,7 +111,6 @@ export const authenticateUser = async (username: string, password: string) => {
   const invalidError = new Error("Invalid username or password");
 
   if (!user || !user.password || !user.team) {
-
     await bcrypt.hash(password, BCRYPT_ROUNDS);
     throw invalidError;
   }
@@ -142,4 +137,105 @@ export const authenticateUser = async (username: string, password: string) => {
     user: { id: user.id, username: user.username, role: user.role },
     team: { id: user.team.id, name: user.team.name },
   };
+};
+
+export const getUserInfo = async (userId: number, teamId: number) => {
+  const user = await prisma.user.findFirst({
+    where: { id: userId, teamId },
+    select: {
+      id: true,
+      username: true,
+      apiKey: true,
+      team: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+
+  if (!user) throw new Error("User not found");
+
+  return user;
+};
+
+export const updateTeamName = async (teamId: number, name: string) => {
+  if (!name || name.length < 2 || name.length > 50) {
+    throw new Error("Team name must be 2-50 characters");
+  }
+
+  const existing = await prisma.team.findFirst({
+    where: { name, id: { not: teamId } },
+  });
+
+  if (existing) {
+    throw new Error("Team name already taken");
+  }
+
+  return await prisma.team.update({
+    where: { id: teamId },
+    data: { name },
+  });
+};
+
+export const regenerateApiKey = async (userId: number, teamId: number) => {
+  const user = await prisma.user.findFirst({
+    where: { id: userId, teamId },
+  });
+
+  if (!user) throw new Error("User not found");
+
+  const newApiKey = generateApiKey();
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { apiKey: newApiKey },
+  });
+
+  return newApiKey;
+};
+
+export const deleteUser = async (userId: number, teamId: number) => {
+  await prisma.$transaction(async (tx) => {
+    await tx.statEvent.deleteMany({
+      where: { game: { teamId } },
+    });
+
+    await tx.startingLineup.deleteMany({
+      where: { game: { teamId } },
+    });
+
+    await tx.substitution.deleteMany({
+      where: { game: { teamId } },
+    });
+
+    await tx.gameRoster.deleteMany({
+      where: { game: { teamId } },
+    });
+
+    await tx.game.deleteMany({
+      where: { teamId },
+    });
+
+    await tx.player.deleteMany({
+      where: { teamId },
+    });
+
+    await tx.competition.deleteMany({
+      where: { teamId },
+    });
+
+    await tx.rosterPreset.deleteMany({
+      where: { teamId },
+    });
+
+    await tx.user.deleteMany({
+      where: { teamId },
+    });
+
+    await tx.team.delete({
+      where: { id: teamId },
+    });
+  });
 };

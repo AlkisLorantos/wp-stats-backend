@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
 import router from "./routes/index";
-import AuthRouter from "./routes/client/auth";
+import AuthRouter from "./routes/auth/auth";
 import { authMiddleware } from "./middleware/client/auth";
 import cookieParser from "cookie-parser";
 

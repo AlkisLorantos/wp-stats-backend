@@ -1,5 +1,5 @@
 import { Router } from "express";
-import authRoutes from "./client/auth";
+import authRoutes from "./auth/auth";
 import playerRoutes from "./player";
 import teamRoutes from "./team";
 import gameRoutes from "./game";
