@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { 
-  createTeamAndCoach, 
+import {
+  createTeamAndCoach,
   authenticateUser,
   getUserInfo,
   updateTeamName,
@@ -8,7 +8,6 @@ import {
   deleteUser,
 } from "../../services/auth/user";
 import { AuthRequest } from "../../middleware/client/auth";
-
 
 const COOKIE_NAME = "token";
 const COOKIE_OPTS = {
@@ -32,9 +31,7 @@ export const signupTeam = async (
 
   try {
     const result = await createTeamAndCoach(username, password, teamName);
-
     res.cookie(COOKIE_NAME, result.token, COOKIE_OPTS);
-
     res.status(201).json({
       message: "Team and user created successfully",
       user: result.user,
@@ -42,7 +39,6 @@ export const signupTeam = async (
       apiKey: result.apiKey,
     });
   } catch (err: any) {
-    console.error("Signup Error:", err);
     res.status(400).json({ message: err.message || "Signup failed" });
   }
 };
@@ -61,9 +57,7 @@ export const login = async (
 
   try {
     const result = await authenticateUser(username, password);
-
     res.cookie(COOKIE_NAME, result.token, COOKIE_OPTS);
-
     res.status(200).json({
       message: "Login successful",
       user: result.user,
@@ -71,7 +65,6 @@ export const login = async (
       apiKey: result.apiKey,
     });
   } catch (err: any) {
-    console.error("Login Error:", err);
     res.status(401).json({ message: "Invalid username or password" });
   }
 };
@@ -140,7 +133,6 @@ export const deleteUserController = async (
     res.clearCookie(COOKIE_NAME);
     res.json({ message: "Account deleted" });
   } catch (err: any) {
-    console.error("Delete user error:", err);
     res.status(500).json({ message: "Failed to delete account" });
   }
 };

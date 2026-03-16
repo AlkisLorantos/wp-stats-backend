@@ -8,22 +8,19 @@ import {
 } from "../services/player";
 import { AuthRequest } from "../middleware/client/auth";
 
-// /players 
 export const getAllPlayers = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const teamId = req.user?.teamId;
+    const teamId = req.user!.teamId;
     const players = await getPlayers(teamId);
     res.json(players);
   } catch (err) {
-    console.error("Error fetching players:", err);
     res.status(500).json({ message: "Failed to fetch players" });
   }
 };
 
-
 export const getPlayer = async (req: AuthRequest, res: Response): Promise<void> => {
   const { id } = req.params;
-  const teamId = req.user?.teamId;
+  const teamId = req.user!.teamId;
 
   try {
     const player = await getPlayerById(Number(id), teamId);
@@ -32,7 +29,7 @@ export const getPlayer = async (req: AuthRequest, res: Response): Promise<void> 
       return;
     }
 
-    res.status(200).json({
+    res.json({
       id: player.id,
       firstName: player.firstName,
       lastName: player.lastName,
@@ -41,17 +38,15 @@ export const getPlayer = async (req: AuthRequest, res: Response): Promise<void> 
       position: player.position,
       birthday: player.birthday,
       totals: player.totals,
-      games: player.games, 
+      games: player.games,
     });
   } catch (err: any) {
-    console.error("Error fetching player:", err);
-    res.status(500).json({ message: "Failed to fetch player", error: err.message });
+    res.status(500).json({ message: "Failed to fetch player" });
   }
 };
 
-//  /players - Create a player
 export const createPlayerController = async (req: AuthRequest, res: Response): Promise<void> => {
-  const teamId = req.user?.teamId;
+  const teamId = req.user!.teamId;
   const { firstName, lastName, capNumber, position } = req.body;
 
   if (!firstName || !lastName) {
@@ -69,14 +64,12 @@ export const createPlayerController = async (req: AuthRequest, res: Response): P
 
     res.status(201).json({ message: "Player created", player });
   } catch (err: any) {
-    console.error("Error creating player:", err);
-    res.status(500).json({ message: "Failed to create player", error: err.message });
+    res.status(400).json({ message: err.message || "Failed to create player" });
   }
 };
 
-//  /players/:id - Update a player
 export const updatePlayerController = async (req: AuthRequest, res: Response): Promise<void> => {
-  const teamId = req.user?.teamId;
+  const teamId = req.user!.teamId;
   const { id } = req.params;
   const { firstName, lastName, capNumber, position } = req.body;
 
@@ -89,22 +82,19 @@ export const updatePlayerController = async (req: AuthRequest, res: Response): P
     });
 
     res.json({ message: "Player updated", player: updated });
-  } catch (err) {
-    console.error(" Error updating player:", err);
-    res.status(500).json({ message: "Failed to update player", error: err.message });
+  } catch (err: any) {
+    res.status(400).json({ message: err.message || "Failed to update player" });
   }
 };
 
-
 export const deletePlayerController = async (req: AuthRequest, res: Response): Promise<void> => {
-  const teamId = req.user?.teamId;
+  const teamId = req.user!.teamId;
   const { id } = req.params;
 
   try {
     await deletePlayer(Number(id), teamId);
     res.json({ message: "Player deleted" });
   } catch (err) {
-    console.error(" Error deleting player:", err);
-    res.status(500).json({ message: "Failed to delete player", error: err.message });
+    res.status(500).json({ message: "Failed to delete player" });
   }
 };

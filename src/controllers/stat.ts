@@ -10,8 +10,6 @@ import {
   getTeamStats,
 } from "../services/stat";
 import { AuthRequest } from "../middleware/client/auth";
-import { createStatSchema, createShotSchema, updateStatSchema } from "../validators/stat";
-import { validate } from "../middleware/validate";
 
 export const createStatController = async (req: AuthRequest, res: Response): Promise<void> => {
   const gameId = Number(req.params.gameId);
@@ -38,7 +36,6 @@ export const createStatController = async (req: AuthRequest, res: Response): Pro
 
     res.status(201).json({ message: "Stat recorded", stat });
   } catch (err: any) {
-    console.error("Error creating stat:", err);
     res.status(500).json({ message: "Failed to create stat" });
   }
 };
@@ -70,7 +67,6 @@ export const createShotWithLocationController = async (req: AuthRequest, res: Re
 
     res.status(201).json({ message: "Shot recorded", ...result });
   } catch (err: any) {
-    console.error("Error creating shot:", err);
     res.status(500).json({ message: "Failed to record shot" });
   }
 };
@@ -97,7 +93,6 @@ export const createGoalWithAssistController = async (req: AuthRequest, res: Resp
 
     res.status(201).json({ message: "Goal recorded", ...result });
   } catch (err: any) {
-    console.error("Error creating goal with assist:", err);
     res.status(500).json({ message: "Failed to record goal" });
   }
 };
@@ -120,7 +115,6 @@ export const updateStatController = async (req: AuthRequest, res: Response): Pro
 
     res.json({ message: "Stat updated", stat });
   } catch (err: any) {
-    console.error("Error updating stat:", err);
     res.status(500).json({ message: "Failed to update stat" });
   }
 };
@@ -133,7 +127,6 @@ export const getGameStatsController = async (req: AuthRequest, res: Response): P
     const stats = await getStatsForGame(gameId, teamId);
     res.json(stats);
   } catch (err: any) {
-    console.error("Error fetching game stats:", err);
     res.status(500).json({ message: "Failed to fetch stats" });
   }
 };
@@ -146,7 +139,6 @@ export const deleteStatController = async (req: AuthRequest, res: Response): Pro
     await deleteStatEvent(statId, teamId);
     res.json({ message: "Stat deleted" });
   } catch (err: any) {
-    console.error("Error deleting stat:", err);
     res.status(500).json({ message: "Failed to delete stat" });
   }
 };
@@ -159,7 +151,6 @@ export const getPlayerStatsController = async (req: AuthRequest, res: Response):
     const stats = await getPlayerStats(playerId, teamId);
     res.json(stats);
   } catch (err: any) {
-    console.error("Error fetching player stats:", err);
     res.status(403).json({ message: "Player not found or unauthorized" });
   }
 };
@@ -171,7 +162,6 @@ export const getTeamStatsController = async (req: AuthRequest, res: Response): P
     const stats = await getTeamStats(teamId);
     res.json(stats);
   } catch (err: any) {
-    console.error("Error fetching team stats:", err);
     res.status(500).json({ message: "Failed to fetch team stats" });
   }
 };
