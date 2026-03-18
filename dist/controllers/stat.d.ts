@@ -1,0 +1,10 @@
+import { Response } from "express";
+import { AuthRequest } from "../middleware/client/auth";
+export declare const createStatController: (req: AuthRequest, res: Response) => Promise<void>;
+export declare const createShotWithLocationController: (req: AuthRequest, res: Response) => Promise<void>;
+export declare const createGoalWithAssistController: (req: AuthRequest, res: Response) => Promise<void>;
+export declare const updateStatController: (req: AuthRequest, res: Response) => Promise<void>;
+export declare const getGameStatsController: (req: AuthRequest, res: Response) => Promise<void>;
+export declare const deleteStatController: (req: AuthRequest, res: Response) => Promise<void>;
+export declare const getPlayerStatsController: (req: AuthRequest, res: Response) => Promise<void>;
+export declare const getTeamStatsController: (req: AuthRequest, res: Response) => Promise<void>;

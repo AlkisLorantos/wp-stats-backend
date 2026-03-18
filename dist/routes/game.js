@@ -1,28 +1,32 @@
 "use strict";
-// import express from "express";
-// import { create, createStats } from '../controllers/game';
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// const router = express.Router()
-// router.post('/game', create);
-// router.post('/game/stat', createStats);
-// export default router;
-// // import express from "express";
-// // import { create, createStats } from "../controllers/game";
-// // const router = express.Router();
-// // router.post("/", async (req, res) => await create(req, res));
-// // router.post("/stat", async (req, res) => await createStats(req, res));
-// // export default router;
-const express_1 = __importDefault(require("express"));
+const express_1 = require("express");
 const game_1 = require("../controllers/game");
-const router = express_1.default.Router();
-router.post("/", async (req, res) => {
-    await (0, game_1.create)(req, res);
-});
-router.post("/stat", async (req, res) => {
-    await (0, game_1.createStats)(req, res);
-});
+const roster_1 = __importDefault(require("./roster"));
+const stat_1 = __importDefault(require("./stat"));
+const auth_1 = require("../middleware/client/auth");
+const roles_1 = require("../middleware/client/roles");
+const lineup_1 = __importDefault(require("./lineup"));
+const substitution_1 = __importDefault(require("./substitution"));
+const validate_1 = require("../middleware/validate");
+const game_2 = require("../validators/game");
+const substitution_2 = require("../controllers/substitution");
+const router = (0, express_1.Router)({ mergeParams: false });
+router.use(auth_1.authMiddleware);
+router.get("/", game_1.getAllGames);
+router.get("/:gameId", game_1.getGame);
+router.post("/", (0, roles_1.requireRole)(["coach"]), (0, validate_1.validate)(game_2.createGameSchema), game_1.createGameController);
+router.put("/:gameId", (0, roles_1.requireRole)(["coach"]), (0, validate_1.validate)(game_2.updateGameSchema), game_1.updateGameController);
+router.delete("/:gameId", (0, roles_1.requireRole)(["coach"]), game_1.deleteGameController);
+router.patch("/:gameId/start", (0, roles_1.requireRole)(["coach"]), game_1.startGameController);
+router.patch("/:gameId/end", (0, roles_1.requireRole)(["coach"]), game_1.endGameController);
+router.use("/:gameId/stats", stat_1.default);
+router.use("/:gameId/substitutions", substitution_1.default);
+router.use("/:gameId/roster", roster_1.default);
+router.use("/:gameId/starting-lineup", lineup_1.default);
+router.get("/:gameId/players/:playerId/playing-time", substitution_2.getPlayerPlayingTime);
 exports.default = router;
 //# sourceMappingURL=game.js.map

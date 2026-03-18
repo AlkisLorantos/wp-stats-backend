@@ -1,94 +1,121 @@
-import { Prisma } from "@prisma/client";
-export declare const createGame: (data: Prisma.GameCreateInput) => Promise<{
+export declare const createGame: ({ date, opponent, location, homeOrAway, teamId, competitionId, }: {
     date: Date;
-    id: number;
-    leagueId: number;
-    homeTeamId: number;
-    awayTeamId: number;
-    homeTeamScore: number;
-    awayTeamScore: number;
-}>;
-export declare const getGame: (id: number) => Promise<{
+    opponent: string;
+    location?: string;
+    homeOrAway: "home" | "away";
+    teamId: number;
+    competitionId?: number;
+}) => Promise<{
     date: Date;
+    location: string | null;
+    status: import(".prisma/client").$Enums.GameStatus;
     id: number;
-    leagueId: number;
-    homeTeamId: number;
-    awayTeamId: number;
-    homeTeamScore: number;
-    awayTeamScore: number;
-} | {
+    teamId: number;
+    opponent: string;
+    homeOrAway: string | null;
+    period: number;
+    teamScore: number;
+    opponentScore: number;
+    competitionId: number | null;
+}>;
+export declare const getGames: (teamId: number) => Promise<({
+    competition: {
+        name: string;
+        type: string | null;
+        id: number;
+        teamId: number;
+        season: string | null;
+    };
+} & {
     date: Date;
+    location: string | null;
+    status: import(".prisma/client").$Enums.GameStatus;
     id: number;
-    leagueId: number;
-    homeTeamId: number;
-    awayTeamId: number;
-    homeTeamScore: number;
-    awayTeamScore: number;
-}[]>;
-export declare const updateGame: (id: number, data: Prisma.GameUpdateInput) => Promise<{
+    teamId: number;
+    opponent: string;
+    homeOrAway: string | null;
+    period: number;
+    teamScore: number;
+    opponentScore: number;
+    competitionId: number | null;
+})[]>;
+export declare const getGameById: (id: number, teamId: number) => Promise<{
     date: Date;
+    location: string;
+    status: import(".prisma/client").$Enums.GameStatus;
     id: number;
-    leagueId: number;
-    homeTeamId: number;
-    awayTeamId: number;
-    homeTeamScore: number;
-    awayTeamScore: number;
+    team: {
+        name: string;
+    };
+    competition: {
+        name: string;
+        type: string | null;
+        id: number;
+        teamId: number;
+        season: string | null;
+    };
+    opponent: string;
+    homeOrAway: string;
+    period: number;
+    teamScore: number;
+    opponentScore: number;
 }>;
-export declare const removeGame: (id: number) => Promise<{
+export declare const updateGame: (id: number, teamId: number, data: {
+    date?: string;
+    opponent?: string;
+    location?: string;
+    homeOrAway?: "home" | "away";
+    teamScore?: number;
+    opponentScore?: number;
+}) => Promise<{
     date: Date;
+    location: string | null;
+    status: import(".prisma/client").$Enums.GameStatus;
     id: number;
-    leagueId: number;
-    homeTeamId: number;
-    awayTeamId: number;
-    homeTeamScore: number;
-    awayTeamScore: number;
+    teamId: number;
+    opponent: string;
+    homeOrAway: string | null;
+    period: number;
+    teamScore: number;
+    opponentScore: number;
+    competitionId: number | null;
 }>;
-export declare const createGameStat: (data: Prisma.GameStatCreateInput) => Promise<{
+export declare const deleteGame: (id: number, teamId: number) => Promise<{
+    date: Date;
+    location: string | null;
+    status: import(".prisma/client").$Enums.GameStatus;
     id: number;
-    playerId: number;
-    gameId: number;
-    shotsMissed: number;
-    shotsScored: number;
-    assists: number;
-    exclusions: number;
-    turnovers: number;
+    teamId: number;
+    opponent: string;
+    homeOrAway: string | null;
+    period: number;
+    teamScore: number;
+    opponentScore: number;
+    competitionId: number | null;
 }>;
-export declare const getGameStat: (id: number) => Promise<{
+export declare const startGame: (id: number, teamId: number) => Promise<{
+    date: Date;
+    location: string | null;
+    status: import(".prisma/client").$Enums.GameStatus;
     id: number;
-    playerId: number;
-    gameId: number;
-    shotsMissed: number;
-    shotsScored: number;
-    assists: number;
-    exclusions: number;
-    turnovers: number;
-} | {
-    id: number;
-    playerId: number;
-    gameId: number;
-    shotsMissed: number;
-    shotsScored: number;
-    assists: number;
-    exclusions: number;
-    turnovers: number;
-}[]>;
-export declare const updateGameStats: (id: number, data: Prisma.GameStatUpdateInput) => Promise<{
-    id: number;
-    playerId: number;
-    gameId: number;
-    shotsMissed: number;
-    shotsScored: number;
-    assists: number;
-    exclusions: number;
-    turnovers: number;
+    teamId: number;
+    opponent: string;
+    homeOrAway: string | null;
+    period: number;
+    teamScore: number;
+    opponentScore: number;
+    competitionId: number | null;
 }>;
-export declare const removeGameStats: (id: number) => Promise<{
+export declare const endGame: (id: number, teamId: number) => Promise<{
+    date: Date;
+    location: string | null;
+    status: import(".prisma/client").$Enums.GameStatus;
     id: number;
-    playerId: number;
-    gameId: number;
-    shotsMissed: number;
-    shotsScored: number;
-    assists: number;
-    exclusions: number;
-    turnovers: number;
+    teamId: number;
+    opponent: string;
+    homeOrAway: string | null;
+    period: number;
+    teamScore: number;
+    opponentScore: number;
+    competitionId: number | null;
 }>;
