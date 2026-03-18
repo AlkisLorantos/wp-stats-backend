@@ -48,7 +48,16 @@ export const addPlayerToRoster = async (
 
   return prisma.gameRoster.create({
     data: { gameId, playerId, capNumber },
-    include: { player: true }
+    include: {
+      player: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          capNumber: true,
+        }
+      }
+    }
   });
 };
 
@@ -73,8 +82,25 @@ export const getRosterForGame = async (gameId: number, teamId: number) => {
   const game = await prisma.game.findFirst({ where: { id: gameId, teamId } });
   if (!game) throw new Error("Game not found or unauthorized");
 
-  return prisma.gameRoster.findMany({
+  const roster = await prisma.gameRoster.findMany({
     where: { gameId },
-    include: { player: true },
+    include: {
+      player: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          capNumber: true,
+        }
+      }
+    },
   });
+
+  return roster.map(r => ({
+    ...r,
+    player: {
+      ...r.player,
+      name: `${r.player.firstName} ${r.player.lastName}`,
+    }
+  }));
 };

@@ -20,25 +20,67 @@ export const createRosterPreset = async (
 };
 
 export const getRosterPresets = async (teamId: number) => {
-  return prisma.rosterPreset.findMany({
+  const presets = await prisma.rosterPreset.findMany({
     where: { teamId },
     include: {
       players: {
-        include: { player: true },
+        include: {
+          player: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              capNumber: true,
+            }
+          }
+        },
       },
     },
   });
+
+  return presets.map(preset => ({
+    ...preset,
+    players: preset.players.map(p => ({
+      ...p,
+      player: {
+        ...p.player,
+        name: `${p.player.firstName} ${p.player.lastName}`,
+      }
+    }))
+  }));
 };
 
 export const getPresetById = async (presetId: number, teamId: number) => {
-  return prisma.rosterPreset.findFirst({
+  const preset = await prisma.rosterPreset.findFirst({
     where: { id: presetId, teamId },
     include: {
       players: {
-        include: { player: true },
+        include: {
+          player: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              capNumber: true,
+            }
+          }
+        },
       },
     },
   });
+
+  if (!preset) return null;
+
+  return {
+    ...preset,
+    players: preset.players.map(p => ({
+      ...p,
+      player: {
+        ...p.player,
+        name: `${p.player.firstName} ${p.player.lastName}`,
+      }
+    }))
+  };
 };
 
 export const deleteRosterPreset = async (presetId: number, teamId: number) => {

@@ -1,12 +1,15 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import { prisma } from "../../lib/prisma"; 
+import { prisma } from "../../lib/prisma";
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET environment variable is required");
-}
+const getJwtSecret = (): string => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET environment variable is required");
+  }
+  return secret;
+};
 
 const BCRYPT_ROUNDS = 12;
 
@@ -39,7 +42,7 @@ const verifyPassword = async (
 const generateToken = (userId: number, role: string, teamId: number): string => {
   return jwt.sign(
     { userId, role, teamId },
-    JWT_SECRET,
+    getJwtSecret(),
     { expiresIn: "7d" }
   );
 };
