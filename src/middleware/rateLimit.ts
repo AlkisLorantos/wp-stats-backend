@@ -7,13 +7,11 @@ const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 });
 
-
 const generalLimiter = new Ratelimit({
   redis,
   limiter: Ratelimit.slidingWindow(100, "1 m"),
   prefix: "ratelimit:general",
 });
-
 
 const authLimiter = new Ratelimit({
   redis,
@@ -21,7 +19,11 @@ const authLimiter = new Ratelimit({
   prefix: "ratelimit:auth",
 });
 
-export const rateLimitGeneral = async (req: Request, res: Response, next: NextFunction) => {
+export const rateLimitGeneral = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const ip = req.ip || req.headers["x-forwarded-for"] || "unknown";
   const identifier = Array.isArray(ip) ? ip[0] : ip;
 
@@ -38,12 +40,15 @@ export const rateLimitGeneral = async (req: Request, res: Response, next: NextFu
 
     next();
   } catch (err) {
-    console.error("Rate limit error:", err);
-    next(); 
+    next();
   }
 };
 
-export const rateLimitAuth = async (req: Request, res: Response, next: NextFunction) => {
+export const rateLimitAuth = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const ip = req.ip || req.headers["x-forwarded-for"] || "unknown";
   const identifier = Array.isArray(ip) ? ip[0] : ip;
 
@@ -60,7 +65,6 @@ export const rateLimitAuth = async (req: Request, res: Response, next: NextFunct
 
     next();
   } catch (err) {
-    console.error("Rate limit error:", err);
     next();
   }
 };

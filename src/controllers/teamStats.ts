@@ -12,7 +12,6 @@ export const getTeamStatsController = async (
     const stats = await getTeamStats(teamId);
     res.json(stats);
   } catch (err: any) {
-    console.error("Error fetching team stats:", err);
     res.status(500).json({ message: "Failed to fetch team stats" });
   }
 };
