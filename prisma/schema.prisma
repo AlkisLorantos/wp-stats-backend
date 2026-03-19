@@ -68,7 +68,7 @@ model Player {
   id         Int      @id @default(autoincrement())
   firstName  String
   lastName   String
-  name       String   @unique
+  name       String
   birthday   DateTime?
   position   String?
   capNumber  Int?
@@ -85,6 +85,8 @@ model Player {
   substitutionsOut Substitution[] @relation("PlayerOut")
 
   StartingLineup StartingLineup[]
+
+  @@unique([teamId, name])
 }
 
 model Competition {
