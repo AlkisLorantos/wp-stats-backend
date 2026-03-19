@@ -59,15 +59,12 @@ export const createGameController = async (
   }
 
   if (!date || !opponent) {
-    res.status(400).json({ 
-      message: "Missing required fields: date or opponent",
-      received: { date, opponent, location, homeOrAway, competitionId }
-    });
+    res.status(400).json({ message: "Missing required fields" });
     return;
   }
 
   if (homeOrAway && homeOrAway !== "home" && homeOrAway !== "away") {
-    res.status(400).json({ message: "homeOrAway must be either 'home' or 'away'" });
+    res.status(400).json({ message: "Invalid input" });
     return;
   }
 
