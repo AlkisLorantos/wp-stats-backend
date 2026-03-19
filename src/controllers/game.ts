@@ -58,12 +58,12 @@ export const createGameController = async (
     return;
   }
 
-  if (!date || !opponent || !homeOrAway) {
-    res.status(400).json({ message: "Missing required fields: date, opponent or homeOrAway" });
+  if (!date || !opponent) {
+    res.status(400).json({ message: "Missing required fields: date or opponent" });
     return;
   }
 
-  if (homeOrAway !== "home" && homeOrAway !== "away") {
+  if (homeOrAway && homeOrAway !== "home" && homeOrAway !== "away") {
     res.status(400).json({ message: "homeOrAway must be either 'home' or 'away'" });
     return;
   }
@@ -72,8 +72,8 @@ export const createGameController = async (
     const newGame = await createGame({
       date: new Date(date),
       opponent,
-      location,
-      homeOrAway,
+      location: location || undefined,
+      homeOrAway: homeOrAway || undefined,
       teamId,
       competitionId: competitionId ? Number(competitionId) : undefined,
     });

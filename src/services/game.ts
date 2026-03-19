@@ -11,7 +11,7 @@ export const createGame = async ({
   date: Date;
   opponent: string;
   location?: string;
-  homeOrAway: "home" | "away";
+  homeOrAway?: "home" | "away";
   teamId: number;
   competitionId?: number;
 }) => {
