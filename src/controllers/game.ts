@@ -50,8 +50,6 @@ export const createGameController = async (
   req: AuthRequest,
   res: Response
 ): Promise<void> => {
-  console.log("Create game request body:", req.body);
-  console.log("User:", req.user);
   const { date, opponent, location, homeOrAway, competitionId } = req.body;
   const teamId = req.user?.teamId;
 
@@ -61,7 +59,10 @@ export const createGameController = async (
   }
 
   if (!date || !opponent) {
-    res.status(400).json({ message: "Missing required fields: date or opponent" });
+    res.status(400).json({ 
+      message: "Missing required fields: date or opponent",
+      received: { date, opponent, location, homeOrAway, competitionId }
+    });
     return;
   }
 
